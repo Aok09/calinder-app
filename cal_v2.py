@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from tkinter import colorchooser, messagebox, font
 from pynput import mouse, keyboard
 
-import cal_v2_line_save, create_event_window
+import cal_v2_line_save, view_booking_window
 
 # called when the window is resized
 def window_update(hold):
@@ -89,7 +89,7 @@ def day_frame_clicked(when, yearly_events_today):
     print ("locking create event", creating_event)
     creating_event = True
 
-    create_event_window.render_create_event_window(
+    view_booking_window.render_create_event_window(
         when, 
         yearly_events_today, 
         render_window_canvas, 
