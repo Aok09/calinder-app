@@ -24,7 +24,7 @@ def generate_month_list(month_displayed, year_displayed, num_months=[1, 10]):
 
 def get_holidays(looking_for_date, events_of_year):
 
-    return []
+    # return []
     holidays_types = [
         "public_holiday",
         "observance",
@@ -137,7 +137,7 @@ def line_spliter(text, max_len):
 
 
 def read_events(year, month, day):
-    file_path = f"data/events/{year}/{month}/{day}.json"
+    file_path = f"users/data/events/{year}/{month}/{day}.json"
 
     if os.path.exists(file_path):
         file = open(file_path, 'r')
@@ -147,6 +147,30 @@ def read_events(year, month, day):
         return day_events
 
     return 404
+
+def save_events(booking_data):
+    #                         year                           month                
+    file_path = f"users/data/events/{booking_data['date'][0]}/{booking_data['date'][1]}/{booking_data['date'][2]}.json"
+
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    existing_data = []
+
+    if os.path.isfile(file_path):
+        with open(file_path, 'r') as file:
+            try:
+                existing_data = json.load(file)
+            except json.decoder.JSONDecodeError:
+                existing_data = []
+    else:
+
+        existing_data = []
+
+    existing_data.append(booking_data)
+
+    if booking_data["looks"][1] == None:
+        booking_data["looks"] = [booking_data["looks"][0], "pink"]
+    with open(file_path, 'w') as file:
+        json.dump(existing_data, file)
 
 
 def text_formatter(text, max_line_length):

@@ -77,7 +77,7 @@ def window_click(event):
     
     if event.y > cc[0] and event.x < cc[1] and event.y < cc[2] and event.x > cc[3]:
         creating_event = False
-        print ("enabled new windows", creating_event)
+        print ("unlocked calendar")
 
 
 def day_frame_clicked(when, yearly_events_today):
@@ -86,7 +86,7 @@ def day_frame_clicked(when, yearly_events_today):
         print ("open create event", creating_event)
         return
 
-    print ("looking create event", creating_event)
+    print ("locking create event", creating_event)
     creating_event = True
 
     create_event_window.render_create_event_window(
@@ -233,14 +233,25 @@ def calendar_day_blocks():
                 booked_events = cal_v2_line_save.read_events(looking_for_date[1], looking_for_date[0], cal[week][day])
                 if booked_events != 404:
                     for i in range(len(booked_events)):
-                        booked_event = render_window_canvas.create_text(
-                            day_frame_start_xpos+5,
-                            day_frame_start_ypos+(text_drop*4)+(30*i), 
-                            text=booked_events[i]["looks"][0], 
-                            font=("Arial", 12), 
-                            fill=booked_events[i]["looks"][1], 
-                            anchor="w"
-                        )
+                        try:
+                            booked_event = render_window_canvas.create_text(
+                                day_frame_start_xpos+5,
+                                day_frame_start_ypos+(text_drop*4)+(30*i), 
+                                text=booked_events[i]["looks"][0], 
+                                font=("Arial", 12), 
+                                fill=booked_events[i]["looks"][1], 
+                                anchor="w"
+                            )
+
+                        except:
+                            booked_event = render_window_canvas.create_text(
+                                day_frame_start_xpos+5,
+                                day_frame_start_ypos+(text_drop*4)+(30*i), 
+                                text=booked_events[i]["looks"][0], 
+                                font=("Arial", 12), 
+                                fill="pink", 
+                                anchor="w"
+                            )
 
                 # bining the interactions for all the days 
                 day_frame_tag = f"day_frame_{week}_{day}"
