@@ -11,7 +11,7 @@ import cal_v2_line_save, view_booking_window
 def window_update(hold):
 
 
-    if view_type == "month":
+    if view_type == "month" or hold == "month":
         page_title()
         calendar_day_blocks()
 
@@ -43,53 +43,29 @@ def page_title():
 # this section is for when the user interacts with something
 # handling the list of months_list when scrolling
 def month_scroll(event):
-    global creating_event
-    if creating_event == True:
-        return
 
-    if event.y < 5+((calendar_window.winfo_height()/11)-12)*2 and event.x > (calendar_window.winfo_width()/5) and event.x < (calendar_window.winfo_width()/5)*4:
-        global looking_for_date
-        if event.delta > 0:
-            looking_for_date[0] -= 1
-            if looking_for_date[0] == 0:
-                looking_for_date[0] = 12
-                looking_for_date[1] -= 1
 
-        elif event.delta < 0:
-            looking_for_date[0] += 1
-            if looking_for_date[0] == 13:
-                looking_for_date[0] = 1
-                looking_for_date[1] += 1
 
-        window_update("")
+    # if event.y < 5+((calendar_window.winfo_height()/11)-12)*2 and event.x > (calendar_window.winfo_width()/5) and event.x < (calendar_window.winfo_width()/5)*4:
+    global looking_for_date
+    if event.delta > 0:
+        looking_for_date[0] -= 1
+        if looking_for_date[0] == 0:
+            looking_for_date[0] = 12
+            looking_for_date[1] -= 1
 
-def window_click(event):
-    global creating_event
-    if creating_event != True:
-        return
+    elif event.delta < 0:
+        looking_for_date[0] += 1
+        if looking_for_date[0] == 13:
+            looking_for_date[0] = 1
+            looking_for_date[1] += 1
 
-    cc = [ 
-        calendar_window.winfo_height()/2-(calendar_window.winfo_width()/8)+1, 
-        calendar_window.winfo_width()/2+(calendar_window.winfo_width()/4)-1, 
-        calendar_window.winfo_height()/2-(calendar_window.winfo_width()/8)+30, 
-        calendar_window.winfo_width()/2+(calendar_window.winfo_width()/4)-30, 
-    ]
-    
-    if event.y > cc[0] and event.x < cc[1] and event.y < cc[2] and event.x > cc[3]:
-        creating_event = False
-        print ("unlocked calendar")
+    window_update("")
 
 
 def day_frame_clicked(when, yearly_events_today):
-    global creating_event
-    if creating_event == True and creating_event != None:
-        print ("open create event", creating_event)
-        return
 
-    print ("locking create event", creating_event)
-    creating_event = True
-
-    view_booking_window.render_create_event_window(
+    view_booking_window.render_booking_view(
         when, 
         yearly_events_today, 
         render_window_canvas, 
@@ -99,7 +75,7 @@ def day_frame_clicked(when, yearly_events_today):
         global_render_object_dict
     )
 
-
+    window_update("")
 # renders all the boxes for the calinder
 def calendar_day_blocks():
 
@@ -108,7 +84,7 @@ def calendar_day_blocks():
     # gets the events for the year
     # this is called every month cos i am lazy and it works for now
 
-    yearly_events = cal_v2_line_save.get_holidays(looking_for_date, events_of_year)
+    yearly_events = [] #cal_v2_line_save.get_holidays(looking_for_date, events_of_year)
     # print (public_holidays)
 
 
@@ -233,25 +209,16 @@ def calendar_day_blocks():
                 booked_events = cal_v2_line_save.read_events(looking_for_date[1], looking_for_date[0], cal[week][day])
                 if booked_events != 404:
                     for i in range(len(booked_events)):
-                        try:
-                            booked_event = render_window_canvas.create_text(
-                                day_frame_start_xpos+5,
-                                day_frame_start_ypos+(text_drop*4)+(30*i), 
-                                text=booked_events[i]["looks"][0], 
-                                font=("Arial", 12), 
-                                fill=booked_events[i]["looks"][1], 
-                                anchor="w"
-                            )
+                        booked_event = render_window_canvas.create_text(
+                            day_frame_start_xpos+5,
+                            day_frame_start_ypos+(text_drop*4)+(30*i), 
+                            text=booked_events[i]["looks"][0], 
+                            font=("Arial", 12), 
+                            fill=booked_events[i]["looks"][1], 
+                            anchor="w"
+                        )
 
-                        except:
-                            booked_event = render_window_canvas.create_text(
-                                day_frame_start_xpos+5,
-                                day_frame_start_ypos+(text_drop*4)+(30*i), 
-                                text=booked_events[i]["looks"][0], 
-                                font=("Arial", 12), 
-                                fill="pink", 
-                                anchor="w"
-                            )
+
 
                 # bining the interactions for all the days 
                 day_frame_tag = f"day_frame_{week}_{day}"
@@ -353,8 +320,6 @@ global looking_for_date
 looking_for_date = [datetime.now().month, datetime.now().year]
 global events_of_year
 events_of_year = {}
-global creating_event
-creating_event = False
 # defining all the colors in one place to make it easyer to change them
 global color_mode
 color_mode = "dark_mode" # or light_mode
@@ -402,6 +367,5 @@ render_window_canvas.bind("<MouseWheel>", month_scroll)
 clock()
 # page_title("")
 render_window_canvas.bind("<Configure>", window_update)
-render_window_canvas.bind("<Button-1>", window_click)
 
 calendar_window.mainloop()

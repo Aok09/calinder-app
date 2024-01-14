@@ -144,6 +144,10 @@ def read_events(year, month, day):
         day_events = json.load(file)
         file.close()
 
+        for i in range(len(day_events)):
+            if day_events[i]["looks"][1] == "None":
+                print ("thats not good")
+                day_events[i]["looks"][1] = "orange"
         return day_events
 
     return 404
