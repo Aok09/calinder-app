@@ -75,7 +75,7 @@ def day_frame_clicked(when, yearly_events_today):
         global_render_object_dict
     )
 
-    window_update("")
+    
 # renders all the boxes for the calinder
 def calendar_day_blocks():
 
@@ -209,16 +209,36 @@ def calendar_day_blocks():
                 booked_events = cal_v2_line_save.read_events(looking_for_date[1], looking_for_date[0], cal[week][day])
                 if booked_events != 404:
                     for i in range(len(booked_events)):
-                        booked_event = render_window_canvas.create_text(
-                            day_frame_start_xpos+5,
-                            day_frame_start_ypos+(text_drop*4)+(30*i), 
-                            text=booked_events[i]["looks"][0], 
-                            font=("Arial", 12), 
-                            fill=booked_events[i]["looks"][1], 
-                            anchor="w"
+                        if len(booked_events) > 4 and i == 2:
+                            booked_event = render_window_canvas.create_text(
+                                day_frame_start_xpos+(day_frame["width"]/2),
+                                day_frame_start_ypos+(text_drop*4)+(30*i), 
+                                text="~~[more hidden]~~", 
+                                font=("Arial", 12), 
+                                fill="white", 
+                                anchor="center"
+                            )
+
+                        elif i < 3:
+                            booked_event = render_window_canvas.create_text(
+                                day_frame_start_xpos+5,
+                                day_frame_start_ypos+(text_drop*4)+(30*i), 
+                                text=booked_events[i]["looks"][0], 
+                                font=("Arial", 12), 
+                                fill=booked_events[i]["looks"][1], 
+                                anchor="w"
+                            )
+
+
+
+
+
+                        booked_event_tag = f"booked_event{week}_{day}"
+                        render_window_canvas.addtag_withtag(booked_event_tag, booked_event)
+                        render_window_canvas.tag_bind(booked_event_tag, "<Button-1>", 
+                            lambda event, d=cal[week][day], m=looking_for_date[0], y=looking_for_date[1], today_event=yearly_events_today: 
+                            day_frame_clicked([d, m, y], today_event)
                         )
-
-
 
                 # bining the interactions for all the days 
                 day_frame_tag = f"day_frame_{week}_{day}"
@@ -243,7 +263,7 @@ def calendar_day_blocks():
 
                         start_color = [255, 255, 255]
                         color = f"#{int(start_color[0] * glow_factor):02X}{int(start_color[1] * glow_factor):02X}{int(start_color[2] * glow_factor):02X}"
-                        glowing = render_window_canvas.create_rectangle(
+                        fade = render_window_canvas.create_rectangle(
                             day_frames["x1"] - step + num_steps, 
                             day_frames["y1"] - step + num_steps, 
                             day_frames["x2"] + step - num_steps, 
@@ -251,7 +271,7 @@ def calendar_day_blocks():
                             outline=color, 
                             width=1
                         )
-                        fades.append(glowing)
+                        fades.append(fade)
 
 
 
