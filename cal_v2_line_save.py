@@ -136,47 +136,62 @@ def line_spliter(text, max_len):
     return text
 
 
-def read_events(year, month, day):
+def read_events(when):
+    day, month, year = when
     file_path = f"users/data/events/{year}/{month}/{day}.json"
 
     if os.path.exists(file_path):
         file = open(file_path, 'r')
-        day_events = json.load(file)
-        file.close()
-
+        try:
+            day_events = json.load(file)
+            file.close()
+        except:
+            print("empty file!")
+            return []
+        error_catch = False
         for i in range(len(day_events)):
             if day_events[i]["looks"][1] == "None":
                 print ("thats not good")
                 day_events[i]["looks"][1] = "orange"
+                error_catch = True
+
+        if error_catch == True:
+            save_events(day_events, {"mode": "mass", "date": [day, month, year], "kick_code": 5504})
         return day_events
 
     return 404
 
-def save_events(booking_data):
-    #                         year                           month                
-    file_path = f"users/data/events/{booking_data['date'][0]}/{booking_data['date'][1]}/{booking_data['date'][2]}.json"
+def save_events(booking_data, exstra):
+    if exstra["mode"] == "single":
+        file_path = f"users/data/events/{booking_data['date'][0]}/{booking_data['date'][1]}/{booking_data['date'][2]}.json"
 
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    existing_data = []
-
-    if os.path.isfile(file_path):
-        with open(file_path, 'r') as file:
-            try:
-                existing_data = json.load(file)
-            except json.decoder.JSONDecodeError:
-                existing_data = []
-    else:
-
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
         existing_data = []
 
-    existing_data.append(booking_data)
+        if os.path.isfile(file_path):
+            with open(file_path, 'r') as file:
+                try:
+                    existing_data = json.load(file)
+                except json.decoder.JSONDecodeError:
+                    existing_data = []
+        else:
 
-    if booking_data["looks"][1] == None:
-        booking_data["looks"] = [booking_data["looks"][0], "pink"]
-    with open(file_path, 'w') as file:
-        json.dump(existing_data, file)
+            existing_data = []
 
+        existing_data.append(booking_data)
 
+        with open(file_path, 'w') as file:
+            json.dump(existing_data, file)
+
+    if exstra["mode"] == "mass":
+        if exstra["kick_code"] != 5504:
+            return 105
+
+        file_path = f"users/data/events/{exstra['date'][0]}/{exstra['date'][1]}/{exstra['date'][2]}.json"
+        with open(file_path, 'w') as file:
+            json.dump(booking_data, file)
+
+            
 def text_formatter(text, max_line_length):
     out_text = ""
     line_len = 0

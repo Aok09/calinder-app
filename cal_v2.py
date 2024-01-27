@@ -206,7 +206,7 @@ def calendar_day_blocks():
                     anchor="center"
                 )
 
-                booked_events = cal_v2_line_save.read_events(looking_for_date[1], looking_for_date[0], cal[week][day])
+                booked_events = cal_v2_line_save.read_events([cal[week][day], looking_for_date[0], looking_for_date[1], ])
                 if booked_events != 404:
                     for i in range(len(booked_events)):
                         if len(booked_events) > 4 and i == 2:
@@ -342,12 +342,13 @@ global events_of_year
 events_of_year = {}
 # defining all the colors in one place to make it easyer to change them
 global color_mode
-color_mode = "dark_mode" # or light_mode
+color_mode = "dark_mode" # dark_mode or light_mode
 global color_dict
 color_dict ={
     "light_mode":{
-        "main_background_color": "#FFF5C2",
-        "text_color": "#6DB9EF",
+        "main_background_color": "green",
+        "text_color": ["pink",
+                       "orange"],
         "importent": "#3081D0",
         "selected_color": "#faffc7",
         "line_color": "black",
