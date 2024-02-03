@@ -187,7 +187,7 @@ def save_events(booking_data, exstra):
         if exstra["kick_code"] != 5504:
             return 105
 
-        file_path = f"users/data/events/{exstra['date'][0]}/{exstra['date'][1]}/{exstra['date'][2]}.json"
+        file_path = f"users/data/events/{exstra['date'][2]}/{exstra['date'][1]}/{exstra['date'][0]}.json"
         with open(file_path, 'w') as file:
             json.dump(booking_data, file)
 
