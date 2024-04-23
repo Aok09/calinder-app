@@ -136,7 +136,12 @@ def line_spliter(text, max_len):
     return text
 
 
+<<<<<<< HEAD:cal_v2_line_save.py
 def read_events(year, month, day):
+=======
+def read_events(baked_date):
+    day, month, year = baked_date
+>>>>>>> 66589b8 (3.0 new version):old/cal_v2_line_save.py
     file_path = f"users/data/events/{year}/{month}/{day}.json"
 
     if os.path.exists(file_path):
@@ -148,6 +153,7 @@ def read_events(year, month, day):
 
     return 404
 
+<<<<<<< HEAD:cal_v2_line_save.py
 def save_events(booking_data):
     #                         year                           month                
     file_path = f"users/data/events/{booking_data['date'][0]}/{booking_data['date'][1]}/{booking_data['date'][2]}.json"
@@ -162,6 +168,12 @@ def save_events(booking_data):
             except json.decoder.JSONDecodeError:
                 existing_data = []
     else:
+=======
+# print(read_events([1,12,2023]))
+def save_events(booking_data, exstra):
+    if exstra["mode"] == "single":
+        file_path = f"users/data/events/{booking_data['date'][0]}/{booking_data['date'][1]}/{booking_data['date'][2]}.json"
+>>>>>>> 66589b8 (3.0 new version):old/cal_v2_line_save.py
 
         existing_data = []
 
@@ -173,6 +185,21 @@ def save_events(booking_data):
         json.dump(existing_data, file)
 
 
+<<<<<<< HEAD:cal_v2_line_save.py
+=======
+        with open(file_path, 'w') as file:
+            json.dump(existing_data, file)
+
+    if exstra["mode"] == "mass":
+        if exstra["kick_code"] != 5504:
+            return 105
+
+        file_path = f"users/data/events/{exstra['date'][0]}/{exstra['date'][1]}/{exstra['date'][2]}.json"
+        with open(file_path, 'w') as file:
+            json.dump(booking_data, file)
+
+            
+>>>>>>> 66589b8 (3.0 new version):old/cal_v2_line_save.py
 def text_formatter(text, max_line_length):
     out_text = ""
     line_len = 0

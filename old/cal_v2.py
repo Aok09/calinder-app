@@ -86,6 +86,7 @@ def day_frame_clicked(when, yearly_events_today):
         print ("open create event", creating_event)
         return
 
+<<<<<<< HEAD:cal_v2.py
     print ("locking create event", creating_event)
     creating_event = True
 
@@ -98,6 +99,9 @@ def day_frame_clicked(when, yearly_events_today):
         color_mode,
         global_render_object_dict
     )
+=======
+    view_booking_window.render_booking_view_window(when, yearly_events_today, color_mode)
+>>>>>>> 66589b8 (3.0 new version):old/cal_v2.py
 
 
 # renders all the boxes for the calinder
