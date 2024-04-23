@@ -64,6 +64,8 @@ key:
 # TODO:
 #   alow users to change and save colors to later be imported vie the user file here
     def color_handler(self, color_switch):
+        # this is what was used inn the v2 
+        # i know its not the best and will be impoved on later
         color_dict = {
             "light_mode":{
                 "main_background_color": "green",
@@ -96,14 +98,23 @@ key:
         self.CV_button = color_dict[color_switch]["button_color"]
         self.CV_backer = color_dict[color_switch]["backer_color"]
 
-    def Window_start_running(self):
+    # this is the start of the running of the main window
+    def Window_ingage(self):
+
         self.VIWV_main_window = tk.Tk()
         self.VIWV_main_window.title(self.VWV_title)
+        self.VWV_render_window_screen = tk.Canvas(
+            self.VIWV_main_window, 
+            width = self.VIWV_main_window.winfo_screenwidth(),
+            height = self.VIWV_main_window.winfo_screenheight(),
+            background = self.CV_background)
+        self.VWV_render_window_screen.pack()
+
+    def window_run(self):
+        self.VIWV_main_window.state(self.WV_state)
         self.VIWV_main_window.mainloop()
-# this is the start of the running of the main window
 
-
-# retunrs the requested color
+    # retunrs the requested color
     
     def HO_background(self):
         return self.CV_background
@@ -131,6 +142,7 @@ key:
 
 
 todays_date = [datetime.now().day, datetime.now().month, datetime.now().year]
-window = calendar_window_data(todays_date, "calendar", "light_mode")
+window = calendar_window_data(todays_date, "calendar", "dark_mode")
 
-window.Window_start_running()
+window.Window_ingage()
+window.window_run()
