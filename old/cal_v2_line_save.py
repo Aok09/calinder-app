@@ -136,8 +136,8 @@ def line_spliter(text, max_len):
     return text
 
 
-def read_events(when):
-    day, month, year = when
+def read_events(baked_date):
+    day, month, year = baked_date
     file_path = f"users/data/events/{year}/{month}/{day}.json"
 
     if os.path.exists(file_path):
@@ -161,6 +161,7 @@ def read_events(when):
 
     return 404
 
+# print(read_events([1,12,2023]))
 def save_events(booking_data, exstra):
     if exstra["mode"] == "single":
         file_path = f"users/data/events/{booking_data['date'][0]}/{booking_data['date'][1]}/{booking_data['date'][2]}.json"
@@ -187,7 +188,7 @@ def save_events(booking_data, exstra):
         if exstra["kick_code"] != 5504:
             return 105
 
-        file_path = f"users/data/events/{exstra['date'][2]}/{exstra['date'][1]}/{exstra['date'][0]}.json"
+        file_path = f"users/data/events/{exstra['date'][0]}/{exstra['date'][1]}/{exstra['date'][2]}.json"
         with open(file_path, 'w') as file:
             json.dump(booking_data, file)
 

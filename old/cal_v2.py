@@ -65,15 +65,7 @@ def month_scroll(event):
 
 def day_frame_clicked(when, yearly_events_today):
 
-    view_booking_window.render_booking_view(
-        when, 
-        yearly_events_today, 
-        render_window_canvas, 
-        calendar_window,
-        color_dict,
-        color_mode,
-        global_render_object_dict
-    )
+    view_booking_window.render_booking_view_window(when, yearly_events_today, color_mode)
 
     
 # renders all the boxes for the calinder

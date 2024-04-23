@@ -1,4 +1,4 @@
-import calendar, time, os, json, requests
+import calendar, time, os, json, requests, pprint
 import tkinter as tk
 from tkinter import ttk
 from datetime import datetime, timedelta
@@ -6,121 +6,123 @@ from tkinter import colorchooser, messagebox, font
 from pynput import mouse, keyboard
 
 import cal_v2_line_save
-def new_sets():
-    global window_size
-    window_size = {
-        "width": 240,
-        "height": 44,
-        "spacing": 70,
+global window_settings
+window_settings = {}
 
+
+global color_dict
+color_dict ={
+    "light_mode":{
+        "main_background_color": "green",
+        "text_color": ["pink",
+                       "orange"],
+        "importent": "#3081D0",
+        "selected_color": "#faffc7",
+        "line_color": "black",
+        "button_color": "black",
+        "backer_color": "green"
+    },
+    "dark_mode":{
+        "main_background_color": "#161d20",
+        "text_color": ["#36498f",
+                       "#fbefd0"],
+        "importent": "#2d7c9d",
+        "selected_color": "#33a29e",
+        "line_color": "#e6e6ff",
+        "button_color": "164c6d",
+        "backer_color": "#1d2125"
     }
-    global settings
-    settings = {
-        "speed": 0,
-        "offset": 0,
-        "scrolling_depth": 3,
-        "max_scroll_limits": {"upper": 0, "lowwer": 0},
-        "speed_reduction": 0.3,
-        "running": [False, False],
-        "tick_speed": 25,
-        "clicked": None
+}
 
+# will need to add a data management and dead window id cleaning 
+def create_new_window_data(id_tag, baked_date, yearly_events_today):
+    # creates the new window data 
+    new_window_data = {
+        "speed": 0, # the speed of the scrolling
+        "offset": 0, # the offset for the scroll
+        "scrolling_depth": 3, # the the pix that each scroll takes 
+        "max_scroll_limits": {"upper": 0, "lowwer": 0}, # upper and lower limits of the scroll bar 
+        "speed_reduction": 0.3, # how much resistance the scroll has 
+        "running": [False, False], # if the bar is moving witch way
+        "tick_speed": 25, # the base time for the scroll bar to update
+        "clicked": None, # if any witch event is clicked
+        "window_size": { # the window dimensions and spacing for the events
+            "width": 240,
+            "height": 44,
+            "spacing": 70
+        },
+        "events_of_the_year": yearly_events_today, 
+        "events_booked": [], # the events that are booked in
+        "render_list":{
+            "events_list_renderd": {}, # list everything in the events today list
+            "event_info_render_list": {}, # list everything in the info side
+            "clicked": None
+        }
     }
 
 
-def render_booking_view(when, yearly_events_today, render_window_canvas, calendar_window, color_dict, color_mode, global_render_object_dict):
-    new_sets()
+    # grabs the booking data separately to check 
+    bookings_today = cal_v2_line_save.read_events(baked_date)
+
+    # if the day has booked events then it will assign
+    if bookings_today != 404 and len(bookings_today) != 0:
+        new_window_data["events_booked"] = bookings_today
+
+    # adds the a trigger to the events list that will create an add event button at the end of the events list
+    new_window_data["events_booked"].append(102059)
+
+    # dumps the new window data into the global window settings
+    window_settings[str(id_tag)] = new_window_data
+
+
+
+def run_sim():
+    render_booking_view_window([8,1,2024], "", "dark_mode")
+
+def render_booking_view_window(baked_date, yearly_events_today, color_mode):
+    # print (baked_date, yearly_events_today, color_mode)
     global sub_window
-    settings["offset"] = 0
-    settings["speed"] = 0
-    sub_window = tk.Toplevel(calendar_window)
-    title = f"{when[0]} {when[1]} {when[2]} {yearly_events_today}"
+    sub_window = tk.Tk()
+    title = f"{baked_date[0]} {baked_date[1]} {baked_date[2]} {yearly_events_today}"
     sub_window.title(title)
-    sub_window.geometry(f"{int(calendar_window.winfo_screenwidth()/2)}x{int(calendar_window.winfo_screenheight()/2)}")
-    
+    sub_window.geometry(f"{int(sub_window.winfo_screenwidth()/2)}x{int(sub_window.winfo_screenheight()/2)}")
     subwindow_render_canvas = tk.Canvas(
         sub_window,
-        width=calendar_window.winfo_screenwidth()/2,
-        height=calendar_window.winfo_screenheight()/2,
+        width=sub_window.winfo_screenwidth()/2,
+        height=sub_window.winfo_screenheight()/2,
         # highlightthickness=0,
         background=color_dict[color_mode]["main_background_color"]
     )
     subwindow_render_canvas.pack()
     
+    create_new_window_data(sub_window, baked_date, yearly_events_today)
+    window_settings[str(sub_window)]["offset"] = 0
+    window_settings[str(sub_window)]["speed"] = 0
 
     sub_window.focus_set()
-    subwindow_render_canvas.bind("<MouseWheel>", lambda event, when=when, yearly_events_today=yearly_events_today, subwindow_render_canvas=subwindow_render_canvas, sub_window=sub_window, color_dict=color_dict, color_mode=color_mode, global_render_object_dict=global_render_object_dict:
-        scrolling(event, when, yearly_events_today, subwindow_render_canvas, sub_window, color_dict, color_mode, global_render_object_dict)
+    subwindow_render_canvas.bind("<MouseWheel>", lambda event, baked_date=baked_date, yearly_events_today=yearly_events_today, subwindow_render_canvas=subwindow_render_canvas, sub_window=sub_window, color_mode=color_mode:
+        scrolling(event, baked_date, yearly_events_today, subwindow_render_canvas, sub_window, color_mode)
     )
 
-    subwindow_render_canvas.bind("<Configure>", lambda event, when=when, yearly_events_today=yearly_events_today, subwindow_render_canvas=subwindow_render_canvas, sub_window=sub_window, color_dict=color_dict, color_mode=color_mode, global_render_object_dict=global_render_object_dict:
-        resizse_event(event, when, yearly_events_today, subwindow_render_canvas, sub_window, color_dict, color_mode, global_render_object_dict),
+    subwindow_render_canvas.bind("<Configure>", lambda event, baked_date=baked_date, yearly_events_today=yearly_events_today, subwindow_render_canvas=subwindow_render_canvas, sub_window=sub_window, color_mode=color_mode:
+        resizse_event(event, baked_date, yearly_events_today, subwindow_render_canvas, sub_window, color_mode),
     )
-    render_create_event_window("event", when, yearly_events_today, subwindow_render_canvas, sub_window, color_dict, color_mode, global_render_object_dict)
-    render_events_list("event", when, yearly_events_today, subwindow_render_canvas, sub_window, color_dict, color_mode, global_render_object_dict)
-    runner()
+    render_create_event_window("", baked_date, yearly_events_today, subwindow_render_canvas, sub_window, color_mode)
+    render_events_list("", baked_date, yearly_events_today, subwindow_render_canvas, sub_window, color_mode)
+    # runner()
+    sub_window.focus_set()
     sub_window.mainloop()
 
-global last_run
-last_run = ""
-def runner():
-    global last_run
-    if last_run != str(settings):
-        # print(settings)
-        # print(global_render_list)
-        last_run = str(settings)
 
-    sub_window.after(1, runner)
+def resizse_event(event, baked_date, yearly_events_today, subwindow_render_canvas, sub_window, color_mode):
+    render_create_event_window(event, baked_date, yearly_events_today, subwindow_render_canvas, sub_window, color_mode)
+    render_events_list(event, baked_date, yearly_events_today, subwindow_render_canvas, sub_window, color_mode)
 
-def resizse_event(event, when, yearly_events_today, subwindow_render_canvas, sub_window, color_dict, color_mode, global_render_object_dict):
-    render_create_event_window(event, when, yearly_events_today, subwindow_render_canvas, sub_window, color_dict, color_mode, global_render_object_dict)
-    render_events_list(event, when, yearly_events_today, subwindow_render_canvas, sub_window, color_dict, color_mode, global_render_object_dict)
-
-def render_create_event_window(event, when, yearly_events_today, subwindow_render_canvas, sub_window, color_dict, color_mode, global_render_object_dict):
+def render_create_event_window(event, baked_date, yearly_events_today, subwindow_render_canvas, sub_window, color_mode):
 
     global creating_event_window_objects
 
-
     creating_event_window_objects = []
-    # gets the right size for the window
-
-
-
-
-
-    create_event_button = subwindow_render_canvas.create_rectangle(
-        subwindow_render_canvas.winfo_reqwidth()-25, 
-        10,
-        subwindow_render_canvas.winfo_reqwidth()-125, 
-        30,
-        outline=color_dict[color_mode]["line_color"],
-        fill=color_dict[color_mode]["backer_color"]
-    )
-    creating_event_window_objects.append(create_event_button)
-
-    create_event_button_text = subwindow_render_canvas.create_text(
-        subwindow_render_canvas.winfo_reqwidth()-75,
-        20,
-        text="create event",
-        font=("Arial", 12),
-        fill=color_dict[color_mode]["text_color"][1],
-        anchor="center"
-    )
-    creating_event_window_objects.append(create_event_button_text)
-    
-
-
-    subwindow_render_canvas.addtag_withtag("event_text", create_event_button_text)   
-    subwindow_render_canvas.tag_bind("event_text", "<Button-1>", 
-        lambda event, CL = sub_window, date=when: 
-        create_event_event_window(event, CL, date)
-    )
-
-    subwindow_render_canvas.addtag_withtag("event_btton", create_event_button)   
-    subwindow_render_canvas.tag_bind("event_btton", "<Button-1>", 
-        lambda event, CL = sub_window, date=when: 
-        create_event_event_window(event, CL, date)
-    )
 
 
     events_today_box = subwindow_render_canvas.create_rectangle(
@@ -131,42 +133,49 @@ def render_create_event_window(event, when, yearly_events_today, subwindow_rende
         # fill= color_dict[color_mode]["backer_color"]
     )
 
-    if "view_booking_window" in global_render_object_dict:
-        for i in range(len(global_render_object_dict["view_booking_window"])):
-            subwindow_render_canvas.delete(global_render_object_dict["view_booking_window"][i])
+    if str(sub_window)+"view_booking_window" in window_settings[str(sub_window)]:
+        for i in range(len(local_render_object_dict[str(sub_window)+"view_booking_window"])):
+            subwindow_render_canvas.delete(local_render_object_dict[str(sub_window)+"view_booking_window"][i])
 
-    booked_events = cal_v2_line_save.read_events(when)
+    booked_events = cal_v2_line_save.read_events(baked_date)
     if type(booked_events) != int and int(subwindow_render_canvas.winfo_reqheight()/70) < len(booked_events)+1:
-            settings["max_scroll_limits"]["upper"] = abs(70*((len(booked_events)-int(subwindow_render_canvas.winfo_reqheight()/70))+1)-subwindow_render_canvas.winfo_reqheight())
-            settings["scrolling"] = True
+            window_settings[str(sub_window)]["max_scroll_limits"]["upper"] = abs(70*((len(booked_events)-int(subwindow_render_canvas.winfo_reqheight()/70))+1)-subwindow_render_canvas.winfo_reqheight())
+            window_settings[str(sub_window)]["scrolling"] = True
     else:
-        settings["scrolling"] = False
+        window_settings[str(sub_window)]["scrolling"] = False
 
+# deleates and unbinds them from the mouse button 
+def remove_rendered(target_list, sub_list):
+    if sub_list in target_list:
+        for i in range(len(target_list[sub_list])):
+            subwindow_render_canvas.delete(target_list[sub_list][i])
 
-def render_events_list(event, when, yearly_events_today, subwindow_render_canvas, sub_window, color_dict, color_mode, global_render_object_dict):
-    # deleates and unbinds them from the mouse button 
-    if "event_render_list" in global_render_object_dict:
-        for i in range(len(global_render_object_dict["event_render_list"])):
-            subwindow_render_canvas.delete(global_render_object_dict["event_render_list"][i])
+# def render_event_buttons(subwindow_render_canvas, color_mode):
+# rendering the list of events in the day
+def render_events_list(event, baked_date, yearly_events_today, subwindow_render_canvas, sub_window, color_mode):
+    
+    remove_rendered(window_settings[str(sub_window)]["render_list"], "events_list_renderd")
 
-    event_render_list = []
     # todays events title
     global save_me_list
-    save_me_list = [event, when, yearly_events_today, subwindow_render_canvas, sub_window, color_dict, color_mode, global_render_object_dict]
+    save_me_list = [event, baked_date, yearly_events_today, subwindow_render_canvas, sub_window, color_mode]
 
-    booked_events = cal_v2_line_save.read_events(when)
+    booked_events = window_settings[str(sub_window)]["events_booked"]
 
     # this needs to be more robost as it keeps falling and not 
-    tags = []
     global event_number
+    event_number = 0
+    event_render_list = []
     event_number = len(booked_events)
-    if booked_events != 404:
-        for i in range(len(booked_events)):
+    for i in range(len(booked_events)):
+        target_event = booked_events[i]
+
+        if target_event not in [404, 102059] :
             frame_info = [
                 10+(subwindow_render_canvas.winfo_reqwidth()/(15/2))+120,
-                70*(i+1)+22 + settings["offset"],
+                70*(i+1)+22 + window_settings[str(sub_window)]["offset"],
                 10+(subwindow_render_canvas.winfo_reqwidth()/(15/2))-120,
-                70*(i+1)-22 + settings["offset"]
+                70*(i+1)-22 + window_settings[str(sub_window)]["offset"]
             ]
 
             booked_event_backer = subwindow_render_canvas.create_rectangle(
@@ -176,47 +185,101 @@ def render_events_list(event, when, yearly_events_today, subwindow_render_canvas
             )
             event_render_list.append(booked_event_backer)
 
-            tag1 = str(booked_events[i]["looks"])+str(i)+"backer"
+            tag1 = str(target_event["looks"])+str(i)+"backer"
             subwindow_render_canvas.addtag_withtag(tag1, booked_event_backer)   
             subwindow_render_canvas.tag_bind(tag1, "<Button-1>", 
-                lambda event, pas=[booked_events[i], sub_window, subwindow_render_canvas, global_render_object_dict, color_dict, color_mode, i, when, frame_info]:  
+                lambda event, pas=[target_event, sub_window, subwindow_render_canvas, color_mode, i, baked_date, frame_info]:  
                 clicked_event(event, pas)
             )
 
 
             booked_event = subwindow_render_canvas.create_text(
                 10+subwindow_render_canvas.winfo_reqwidth()/(15/2),
-                70*(i+1) + settings["offset"], 
-                text=booked_events[i]["looks"][0], 
+                70*(i+1) + window_settings[str(sub_window)]["offset"], 
+                text=target_event["looks"][0], 
                 font=("Arial", 12), 
-                fill=booked_events[i]["looks"][1], 
+                fill=target_event["looks"][1], 
                 anchor="center"
             )  
             event_render_list.append(booked_event)
 
 
-            booked_events[i]["render_point"] = [
+            target_event["render_point"] = [
                 10+subwindow_render_canvas.winfo_reqwidth()/(15/2), 
-                70*(i+1) + settings["offset"]
+                70*(i+1) + window_settings[str(sub_window)]["offset"]
             ]
 
-            tag2 = str(booked_events[i]["looks"])+str(i)
+            tag2 = str(target_event["looks"])+str(i)
             subwindow_render_canvas.addtag_withtag(tag2, booked_event)   
             subwindow_render_canvas.tag_bind(tag2, "<Button-1>", 
-                lambda event, pas=[booked_events[i], sub_window, subwindow_render_canvas, global_render_object_dict, color_dict, color_mode, i, when, frame_info]:  
+                lambda event, pas=[target_event, sub_window, subwindow_render_canvas, color_mode, i, baked_date, frame_info]:  
                 clicked_event(event, pas)
             )
 
-            tags.append([tag1, tag2])
-            if i == settings["clicked"]:
+            if target_event == window_settings[str(sub_window)]["clicked"]:
                 booking_high = subwindow_render_canvas.create_rectangle(
                     frame_info,
-                    outline=booked_events[i]["looks"][1]
+                    outline=target_event["looks"][1]
                 )
 
                 event_render_list.append(booking_high)
-                global_render_object_dict["clicked"] = booking_high
-    # print (tags)
+                local_render_object_dict[str(sub_window)+"clicked"] = booking_high
+
+        # adds the create even button to the end of the events list
+        else:  
+            frame_info = [
+                10+(subwindow_render_canvas.winfo_reqwidth()/(15/2))+120,
+                70*(i+1)+22 + window_settings[str(sub_window)]["offset"],
+                10+(subwindow_render_canvas.winfo_reqwidth()/(15/2))-120,
+                70*(i+1)-22 + window_settings[str(sub_window)]["offset"]
+            ]
+
+            booked_event_backer = subwindow_render_canvas.create_rectangle(
+                frame_info,
+                outline="pink", #color_dict[color_mode]["backer_color"],
+                fill="pink" #color_dict[color_mode]["backer_color"]
+            )
+            event_render_list.append(booked_event_backer)
+
+            tag1 = "lol"+str(i)+"backer"
+            subwindow_render_canvas.addtag_withtag(tag1, booked_event_backer)   
+            subwindow_render_canvas.tag_bind(tag1, "<Button-1>", 
+                lambda event, CL = sub_window, date=baked_date: 
+                create_event_event_window(event, CL, date)
+            )
+
+            booked_event = subwindow_render_canvas.create_text(
+                10+subwindow_render_canvas.winfo_reqwidth()/(15/2),
+                70*(i+1) + window_settings[str(sub_window)]["offset"], 
+                text="lol", #target_event["looks"][0], 
+                font=("Arial", 12), 
+                fill="pink", #target_event["looks"][1], 
+                anchor="center"
+            )  
+            event_render_list.append(booked_event)
+
+
+            tag2 = str("target_event[]")+str(i)
+            subwindow_render_canvas.addtag_withtag(tag2, booked_event)   
+            subwindow_render_canvas.tag_bind(tag2, "<Button-1>", 
+                lambda event, CL = sub_window, date=baked_date: 
+                create_event_event_window(event, CL, date)
+            )
+
+
+
+
+            if target_event == window_settings[str(sub_window)]["clicked"]:
+                booking_high = subwindow_render_canvas.create_rectangle(
+                    frame_info,
+                    outline=target_event["looks"][1]
+                )
+
+                event_render_list.append(booking_high)
+
+
+
+
 
     title_cover_plate = subwindow_render_canvas.create_rectangle(
         0, 0,
@@ -236,30 +299,33 @@ def render_events_list(event, when, yearly_events_today, subwindow_render_canvas
 
 
 
-    global_render_object_dict["event_render_list"] = event_render_list
+    window_settings[str(sub_window)]["events_list_render"] = event_render_list
 
 
 def clicked_event(event, pas):
-    booking, sub_window, subwindow_render_canvas, global_render_object_dict, color_dict, color_mode, pos, when, frame_info = pas
+    pprint.pprint (window_settings)
+
+    booking, sub_window, subwindow_render_canvas, color_mode, pos, baked_date, frame_info = pas
     global clicked_event_deets_disp
     clicked_event_deets_disp = []
     
     # # this is for the highlighting the event that has been clicked and allowing the highlight to scroll with the events list 
-    if "clicked" in global_render_object_dict:
-        subwindow_render_canvas.delete(global_render_object_dict["clicked"])
-
-    settings["clicked"] = pos
 
 
-    booking_color_border = subwindow_render_canvas.create_rectangle(
+    if window_settings[str(sub_window)]["render_list"]["clicked"] == pos:
+        window_settings[str(sub_window)]["render_list"]["clicked"] = None
+    else:
+        window_settings[str(sub_window)]["render_list"]["clicked"] = pos
+
+
+    booking_colord_border = subwindow_render_canvas.create_rectangle(
         frame_info,
         outline=booking["looks"][1]
     )
-    global_render_object_dict["event_render_list"].append(booking_color_border)
-    global_render_object_dict["clicked"] = booking_color_border
+    window_settings[str(sub_window)]["render_list"]["events_list_renderd"] = (booking_colord_border)
+    window_settings[str(sub_window)]["render_list"]["clicked"] = booking_colord_border
 
 
-    # this is for sholwing the users options and the event data 
 
 
     booking_info_XY = [
@@ -277,12 +343,12 @@ def clicked_event(event, pas):
         outline=color_dict[color_mode]["line_color"],
         fill=color_dict[color_mode]["backer_color"]
     )
-    creating_event_window_objects.append(delete_event_button)
+    creating_event_window_objects.append(delete_event_button) 
 
     delete_event_bttn_text = subwindow_render_canvas.create_text(
         20+((subwindow_render_canvas.winfo_reqwidth()/(15/2))*2)+25+(125/2),
         20,
-        text="create event",
+        text="delete event",
         font=("Arial", 12),
         fill=color_dict[color_mode]["text_color"][1],
         anchor="center"
@@ -292,14 +358,14 @@ def clicked_event(event, pas):
     tag = "del"
     subwindow_render_canvas.addtag_withtag(tag, delete_event_button)   
     subwindow_render_canvas.tag_bind(tag, "<Button-1>", 
-        lambda event, pas=[pos, when, sub_window]:  
+        lambda event, pas=[pos, baked_date, sub_window]:  
         delete_sected_event(event, pas)
     )
 
     tag = "de1"
     subwindow_render_canvas.addtag_withtag(tag, delete_event_bttn_text)   
     subwindow_render_canvas.tag_bind(tag, "<Button-1>", 
-        lambda event, pas=[pos, when, sub_window]:  
+        lambda event, pas=[pos, baked_date, sub_window]:  
         delete_sected_event(event, pas)
     )
 
@@ -342,33 +408,30 @@ def clicked_event(event, pas):
         anchor="nw"
     )
     clicked_event_deets_disp.append(booking_time)
+    remove_rendered(window_settings[str(sub_window)]["render_list"], "show_event")
+    # if str(sub_window)+"show_event" in local_render_object_dict:
+    #     for i in range(len(local_render_object_dict[str(sub_window)+"show_event"])):
+    #         subwindow_render_canvas.delete(local_render_object_dict[str(sub_window)+"show_event"][i])
 
-    if "show_event" in global_render_object_dict:
-        for i in range(len(global_render_object_dict["show_event"])):
-            subwindow_render_canvas.delete(global_render_object_dict["show_event"][i])
-
-    global_render_object_dict["show_event"] = clicked_event_deets_disp
-
+    window_settings[str(sub_window)]["render_list"]["show_event"] = clicked_event_deets_disp
+                               # event, baked_date, yearly_events_today,                                    subwindow_render_canvas, sub_window, color_mode
+    render_create_event_window(event, baked_date, window_settings[str(sub_window)]["events_of_the_year"], subwindow_render_canvas, sub_window, color_mode)
 
 def delete_sected_event(event, pas):
-    # pas 1 is the position on the list, and 2 is the when
+    # pas 1 is the position on the list, and 2 is the baked_date
     events_listed = cal_v2_line_save.read_events(pas[1])
-    print(events_listed)
+    event, baked_date, yearly_events_today, subwindow_render_canvas, sub_window, color_mode = save_me_list
     
     result = messagebox.askquestion("Confirmation", f"do you want to delete {events_listed[pas[0]]['looks'][0]}")
     if result == "yes":
         events_listed.pop(pas[0])
-        # print (events_listed)
         cal_v2_line_save.save_events(events_listed, {"date": [pas[1][2], pas[1][1], pas[1][0]], "mode": "mass", "kick_code": 5504})
-        event, when, yearly_events_today, subwindow_render_canvas, sub_window, color_dict, color_mode, global_render_object_dict = save_me_list
-        render_events_list(event, when, yearly_events_today, subwindow_render_canvas, sub_window, color_dict, color_mode, global_render_object_dict)
+        render_events_list(event, baked_date, yearly_events_today, subwindow_render_canvas, sub_window, color_mode)
     elif result == "no":
         pass
-        # print ("no")
 
     else:
-        pass
-        # print (result)
+        print (f"unser how got here: {result}")
 
     sub_window.focus_set()
 
@@ -379,7 +442,7 @@ clicked_event_deets_disp = []
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # this is for scroling up and down with custom rasistance so it fels nice                   #
 # needs a masive rework and to not be file dependant and instead just spits out an offset   #
-# when run will keep running till the speed or an offset limit is reached                   #
+# baked_date run will keep running till the speed or an offset limit is reached             #
 # also changes the rendering for the events list for this (split it)                        #
 # so that it only needs to keep rendering the evens and dosnt need render the window again  #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -389,55 +452,54 @@ def neg(num):
         return num
     return int("-"+str(num))
 
-def scrolling(event, when, yearly_events_today, subwindow_render_canvas, sub_window, color_dict, color_mode, global_render_object_dict):
-    global settings
-    if settings["scrolling"] == False:
+def scrolling(event, baked_date, yearly_events_today, subwindow_render_canvas, sub_window, color_mode):
+    if window_settings[str(sub_window)]["scrolling"] == False:
         # print ("scroll kick: no scrolling len")
         return
 
-    settings["max_scroll_limits"]["upper"] = neg((window_size["spacing"]*event_number)-sub_window.winfo_height()+window_size["spacing"])
+    window_settings[str(sub_window)]["max_scroll_limits"]["upper"] = neg((window_settings[str(sub_window)]["window_size"]["spacing"]*event_number)-sub_window.winfo_height()+window_settings[str(sub_window)]["window_size"]["spacing"])
     # print (event.delta)
-    if event.delta > 0: # and settings["running"][1] != True:
-        settings["speed"] -= settings["scrolling_depth"]
+    if event.delta > 0: # and window_settings[str(sub_window)]["running"][1] != True:
+        window_settings[str(sub_window)]["speed"] -= window_settings[str(sub_window)]["scrolling_depth"]
         # print ("scroll_up")
-        scrolling_funk(event, when, yearly_events_today, subwindow_render_canvas, sub_window, color_dict, color_mode, global_render_object_dict)
+        scrolling_funk(event, baked_date, yearly_events_today, subwindow_render_canvas, sub_window, color_mode)
 
-    if event.delta < 0: # and settings["running"][0] != True:
-        settings["speed"] += settings["scrolling_depth"]
+    if event.delta < 0: # and window_settings[str(sub_window)]["running"][0] != True:
+        window_settings[str(sub_window)]["speed"] += window_settings[str(sub_window)]["scrolling_depth"]
         # print ("scroll_down")
-        scrolling_funk(event, when, yearly_events_today, subwindow_render_canvas, sub_window, color_dict, color_mode, global_render_object_dict)
+        scrolling_funk(event, baked_date, yearly_events_today, subwindow_render_canvas, sub_window, color_mode)
 
 
 
-def scrolling_funk(event, when, yearly_events_today, subwindow_render_canvas, sub_window, color_dict, color_mode, global_render_object_dict):
-    # print ("scrilling,", settings)
-    if int(settings["speed"]) != 0:
+def scrolling_funk(event, baked_date, yearly_events_today, subwindow_render_canvas, sub_window, color_mode):
+    # print ("scrilling,", window_settings[str(sub_window)])
+    if int(window_settings[str(sub_window)]["speed"]) != 0:
 
-        if settings["offset"] - settings["speed"] < settings["max_scroll_limits"]["upper"]:
-            settings["speed"] = 0
-            # print (f"scroll kicked: ofset will exseed given scroll limit of :{settings['max_scroll_limits']['upper']} with :{settings['offset'] + settings['speed']} || ID: 2044568")
-            # settings["offset"] = settings["max_scroll_limits"]["upper"]+1
+        if window_settings[str(sub_window)]["offset"] - window_settings[str(sub_window)]["speed"] < window_settings[str(sub_window)]["max_scroll_limits"]["upper"]:
+            window_settings[str(sub_window)]["speed"] = 0
+            # print (f"scroll kicked: ofset will exseed given scroll limit of :{window_settings[str(sub_window)]['max_scroll_limits']['upper']} with :{window_settings[str(sub_window)]['offset'] + window_settings[str(sub_window)]['speed']} || ID: 2044568")
+            # window_settings[str(sub_window)]["offset"] = window_settings[str(sub_window)]["max_scroll_limits"]["upper"]+1
             return
 
-        if settings["offset"] - settings["speed"] > settings["max_scroll_limits"]["lowwer"]:
-            settings["speed"] = 0
-            # print (f"scroll kicked: ofset will exseed given scroll limit of :{settings['max_scroll_limits']['lowwer']} with :{settings['offset'] + settings['speed']} || ID: 2044568")
-            # settings["offset"] = settings["max_scroll_limits"]["lowwer"]-1
+        if window_settings[str(sub_window)]["offset"] - window_settings[str(sub_window)]["speed"] > window_settings[str(sub_window)]["max_scroll_limits"]["lowwer"]:
+            window_settings[str(sub_window)]["speed"] = 0
+            # print (f"scroll kicked: ofset will exseed given scroll limit of :{window_settings[str(sub_window)]['max_scroll_limits']['lowwer']} with :{window_settings[str(sub_window)]['offset'] + window_settings[str(sub_window)]['speed']} || ID: 2044568")
+            # window_settings[str(sub_window)]["offset"] = window_settings[str(sub_window)]["max_scroll_limits"]["lowwer"]-1
             return
 
 
-        if int(settings["speed"]) > 0:
-            settings["offset"] -= int(settings["speed"])
-            settings["speed"] -= settings["speed_reduction"]/4
+        if int(window_settings[str(sub_window)]["speed"]) > 0:
+            window_settings[str(sub_window)]["offset"] -= int(window_settings[str(sub_window)]["speed"])
+            window_settings[str(sub_window)]["speed"] -= window_settings[str(sub_window)]["speed_reduction"]/4
 
-        if int(settings["speed"]) < 0:
-            settings["offset"] -= int(settings["speed"])
-            settings["speed"] += settings["speed_reduction"]/4
+        if int(window_settings[str(sub_window)]["speed"]) < 0:
+            window_settings[str(sub_window)]["offset"] -= int(window_settings[str(sub_window)]["speed"])
+            window_settings[str(sub_window)]["speed"] += window_settings[str(sub_window)]["speed_reduction"]/4
 
-        render_events_list(event, when, yearly_events_today, subwindow_render_canvas, sub_window, color_dict, color_mode, global_render_object_dict)
+        render_events_list(event, baked_date, yearly_events_today, subwindow_render_canvas, sub_window, color_mode)
 
-        sub_window.after(25, lambda event="", when=when, yearly_events_today=yearly_events_today, subwindow_render_canvas=subwindow_render_canvas, sub_window=sub_window, color_dict=color_dict, color_mode=color_mode, global_render_object_dict=global_render_object_dict:
-            scrolling_funk(event, when, yearly_events_today, subwindow_render_canvas, sub_window, color_dict, color_mode, global_render_object_dict)
+        sub_window.after(25, lambda event="", baked_date=baked_date, yearly_events_today=yearly_events_today, subwindow_render_canvas=subwindow_render_canvas, sub_window=sub_window, color_mode=color_mode:
+            scrolling_funk(event, baked_date, yearly_events_today, subwindow_render_canvas, sub_window, color_mode)
         )
 
 
@@ -447,7 +509,7 @@ def scrolling_funk(event, when, yearly_events_today, subwindow_render_canvas, su
 # and event editing (to be added)                                     #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-def create_event_event_window(event, sub_window, when):
+def create_event_event_window(event, sub_window, baked_date):
     global event_input_frame
     global event_date_selecter
     sub_window = tk.Toplevel(sub_window)
@@ -459,7 +521,7 @@ def create_event_event_window(event, sub_window, when):
     event_date_selecter.pack(side="top")
 
 
-    create_date_widgets(when[2], when[1], when[0], [0], "", sub_window)
+    create_date_widgets(baked_date[2], baked_date[1], baked_date[0], [0], "", sub_window)
 
 def create_date_widgets(year_clciked, month_clciked, day_clicked, event_viewing, run_mode, sub_window):
     global color_entry, info_input_entery, color_label, color_hold
@@ -525,13 +587,6 @@ def create_date_widgets(year_clciked, month_clciked, day_clicked, event_viewing,
         update_date_button.pack()
 
 
-    year_combobox.bind("<<ComboboxSelected>>", update_datedays)
-    month_combobox.bind("<<ComboboxSelected>>", dateselcter_month_display)
-    day_combobox.bind("<<ComboboxSelected>>", event_day_selecter)
-    hour_start_Comb.bind("<<ComboboxSelected>>", event_start_hour_selecter)
-    minute_start_Comb.bind("<<ComboboxSelected>>", event_start_minute_selecter)
-    hour_end_Comb.bind("<<ComboboxSelected>>", event_end_hour_selecter)
-    minute_end_Comb.bind("<<ComboboxSelected>>", event_end_minute_selecter)
 
 
     choose_color_button = tk.Button(event_input_frame, text="Choose Color", command=lambda: color_selecter(sub_window))
@@ -561,6 +616,15 @@ def create_date_widgets(year_clciked, month_clciked, day_clicked, event_viewing,
     event_end_hour_selecter("")
     event_end_minute_selecter("")
     day_combobox.set(day_clicked)
+
+    year_combobox.bind("<<ComboboxSelected>>", update_datedays)
+    month_combobox.bind("<<ComboboxSelected>>", dateselcter_month_display)
+    day_combobox.bind("<<ComboboxSelected>>", event_day_selecter)
+    hour_start_Comb.bind("<<ComboboxSelected>>", event_start_hour_selecter)
+    minute_start_Comb.bind("<<ComboboxSelected>>", event_start_minute_selecter)
+    hour_end_Comb.bind("<<ComboboxSelected>>", event_end_hour_selecter)
+    minute_end_Comb.bind("<<ComboboxSelected>>", event_end_minute_selecter)
+
 
 def show_event_details(event_data):
     global event_input_frame
@@ -744,3 +808,5 @@ def create_event_main():
 
     # place_event_today(event_place_data, current_day_canvas)
     # full_month_view(current_year, current_month)
+
+# run_sim()
