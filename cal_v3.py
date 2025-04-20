@@ -20,7 +20,7 @@ this is to fill list spot to keep the values correct but will not error out
 [DAY:MONTH:YEAR] -1
 #####
 
-Keys:
+key:
     CV = Color Variable
     HO = Hand Out
     UIV = User Interface Variable 
@@ -44,7 +44,7 @@ Keys:
         #   add movew viewing methods
         self.UIV_viewing_method = 0
 
-        # the date the calinder is looking for to be transferd to the calnder class
+        # the date the calinder is looking for to highlight as the today 
         self.ICV_date_today = given_date
 
         # simply window title
@@ -101,11 +101,8 @@ Keys:
     # this is the start of the running of the main window
     def Window_ingage(self):
 
-        # the window will start fully opened and snaped to windows so it isnt spilling off the screen 
         self.VIWV_main_window = tk.Tk()
         self.VIWV_main_window.title(self.VWV_title)
-
-        # this is used to render as mucking around with tk's internal grid or pack system is like sticking your dick in a fire ant nest
         self.VWV_render_window_screen = tk.Canvas(
             self.VIWV_main_window, 
             width = self.VIWV_main_window.winfo_screenwidth(),
@@ -113,15 +110,7 @@ Keys:
             background = self.CV_background)
         self.VWV_render_window_screen.pack()
 
-
-    # this can be called when ready to run
-    # this is so if i end up implomenting any mutli threding there is no race contiont
-    # this will also be usfull for putting the windo into a "standby mode" where the code is still running but there is no window
     def window_run(self):
-        # TODO:
-        #   alow the user to change what the window starts 
-        #   change the window live (maybe if thats posible
-        #       may end up kulling and restarting the window but that may be something that would work
         self.VIWV_main_window.state(self.WV_state)
         self.VIWV_main_window.mainloop()
 
@@ -148,78 +137,9 @@ Keys:
     def HO_backer(self):
         return self.CV_backer
 
-class scrolling_calinder(object):
-    """docstring for scrolling_calinder
-
-runs with an offset using an older project from v2 alowing things to scroll
-this should be really nice instead of just jumping betwean months it can nicly scroll
-
-as of yet unsure how this will work but should be intresting
-
-when transerfering dates:
- -- MUST BE: -- 
-    [DAY:MONTH:YEAR]
-in or out that is the format to use for dates to avoiod having to brake down fuctions
-if if one of them is not given or is not output then fill with: -1
-this is to fill list spot to keep the values correct but will not error out
-#####
-[DAY:MONTH:YEAR] -1
-#####
-
-Keys:
-    CV = Color Variable
-    HO = Hand Out
-    UIV = User Interface Variable 
-    ICV = Internal Calendar Variable
-    WV = Window Variable
-    VWV = Vital Window Variable
-    VIWV = Vital Interal Window Variable 
-    """
-
-    def __init__(self, arg):
-        self.arg
-        
 
 
 
-class scroll_handler(object):
-    """docstring for scroll_handler
-an adaption of the scrolling-buttons project that was made for showing the events in v2
-
-upgrading to a class to more easly alow more that one scroll to be working
-
-########
-this has no use for TK or events, this is just a number cruncher and alows for more wide spread code usage
-########
-
-
-if i rember correctly (im not going to go checking as my doc for that is just none)
-i used a dict and then "scroll id's" for each diffrant scroller
-this worked for sure but was intresting to work with and was a pain to implement without alot setting up
-
-for this i am going to be using a simler ish stuctuer but with a more cut down version that will just be a simple call and responce
-with less post call prosessing
-
-
-########
-this will take a dict so that it can be changed more easly and adably
-
-settings = {
-    "speed": 0,
-    "offset": 0,
-    "scrolling_depth": 3,
-    "max_upper_scroll_limit": 0 # this is 
-    "speed_reduction": 0.3,
-    "running": [False, False],
-    "tick_speed": 25
-
-}
-########
-"""
-    def __init__(self, arg):
-        super(scroll_handler, self).__init__()
-        self.
-        
 
 todays_date = [datetime.now().day, datetime.now().month, datetime.now().year]
 window = calendar_window_data(todays_date, "calendar", "dark_mode")
