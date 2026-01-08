@@ -10,7 +10,9 @@ class MainWindow(tk.Tk):
     def __init__(self):
         super().__init__() # this is what tels the class to use tk
         self.CC = ColorControl() # this is the color control 
+        self.ElemntBuilder = Eliment()
         self.Monitor = get_monitors()[0] # gets the second monitor
+
 
         self.TBDOTTAR = [] # or TheBigDictOfThingsThatAreRenderd :)
         # creates the window and places it on the second screen
@@ -25,7 +27,8 @@ class MainWindow(tk.Tk):
         self.mainloop()
 
     def OnStart(self):
-        DayEventsBGC = Eliment().BuildDayEvents(self, self.CalinderCanvas) # creates the side bar to view the the events of today
-        self.TBDOTTAR.append(DayEventsBGC)
+        print ("run start")
+        self.ElemntBuilder.BuildDayEvents(self, self.CalinderCanvas) # creates the side bar to view the the events of today
+        self.ElemntBuilder.BuildMonthDayGrid(self, self.CalinderCanvas)
 
 MainWindow()

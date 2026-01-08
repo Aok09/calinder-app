@@ -22,7 +22,6 @@ class CreateUiElimants():
         # T2 = MainCanvas.create_line(175, 0, 175, ScreenData.height, fill=self.CC.HighLightColor())
         # LittleTempList.append(T2)
         HourSepration = RoundToSigN(Window.winfo_height() / 24)-0.1
-        print (Window.winfo_height(), HourSepration)
         offset = 0
         for x in range(25):
             # creates a line for each our in the day at a reguler interval
@@ -36,3 +35,45 @@ class CreateUiElimants():
                 Hour = f"{x - 12}"
             T4 = MainCanvas.create_text(175, offset-7, text=Hour, fill=self.CC.HighLightColor())
             offset += HourSepration
+            LittleTempList.append(T4)
+
+        return LittleTempList
+
+
+    def BuildMonthDayGrid(self, Window, MainCanvas):
+        # the main calinder grid is:
+        # top left: 360 x 150 - to give space for the title/month or what ever
+        # the bottem right: the window size -10 in both directions  
+
+        # todo [ ] make these dynamic
+        StaticTopWidthoffset = 360
+        StaticTopHightOffset = 150
+        StaticBottomWidthOffset = Window.winfo_width() - 10
+        StaticBottomHightOffset = Window.winfo_height() - 10
+
+        # test squere to check if i put in the right spot
+        # MainCanvas.create_rectangle(StaticTopWidthoffset, StaticTopHightOffset, StaticBottomWidthOffset, StaticBottomHightOffset, fill="red", outline="pink")
+        
+        # creates the actual working space i have for the main calinder squeres
+        WorkingWidth = StaticBottomWidthOffset - StaticTopWidthoffset
+        WorkingHight = StaticBottomHightOffset - StaticTopHightOffset
+        
+        # the size of each box
+        DayWidth = WorkingWidth/7
+        DayHight = WorkingHight/6
+
+        DayWidthOffSet = StaticTopWidthoffset
+        DayHightOffSet = StaticTopHightOffset
+
+        #creates the calnder gird that is 7 across and 6 down
+        for Hight in range(6):
+            for Width in range(7):
+                MainCanvas.create_rectangle(
+                    DayWidthOffSet, DayHightOffSet, # top left
+                    DayWidthOffSet+DayWidth, DayHightOffSet+DayHight, # bottom right 
+                    fill=self.CC.LightBackGroundColor(), 
+                    outline=self.CC.HighLightColor())
+                # correct line 
+                DayWidthOffSet += DayWidth
+            DayWidthOffSet = StaticTopWidthoffset
+            DayHightOffSet += DayHight
