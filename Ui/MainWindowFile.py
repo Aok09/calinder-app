@@ -44,6 +44,10 @@ class CreateUiElimants():
         # the main calinder grid is:
         # top left: 360 x 150 - to give space for the title/month or what ever
         # the bottem right: the window size -10 in both directions  
+        # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+        # this still needs to be more intorctive for the months so that it knows what days are "active"
+        # i am not sure if this is the function to handle the event data yet, 
+        # it could hand back the data on newly placed as well as the needed coords
 
         # todo [ ] make these dynamic
         StaticTopWidthoffset = 360
@@ -58,22 +62,23 @@ class CreateUiElimants():
         WorkingWidth = StaticBottomWidthOffset - StaticTopWidthoffset
         WorkingHight = StaticBottomHightOffset - StaticTopHightOffset
         
-        # the size of each box
+        # the size of each day box
         DayWidth = WorkingWidth/7
         DayHight = WorkingHight/6
 
+        # the active off set that changes to place each day correclty
         DayWidthOffSet = StaticTopWidthoffset
         DayHightOffSet = StaticTopHightOffset
 
         #creates the calnder gird that is 7 across and 6 down
-        for Hight in range(6):
-            for Width in range(7):
+        for Hight in range(6): # how meany weeks to add
+            for Width in range(7): # how meany days in a week
                 MainCanvas.create_rectangle(
                     DayWidthOffSet, DayHightOffSet, # top left
                     DayWidthOffSet+DayWidth, DayHightOffSet+DayHight, # bottom right 
                     fill=self.CC.LightBackGroundColor(), 
                     outline=self.CC.HighLightColor())
-                # correct line 
-                DayWidthOffSet += DayWidth
-            DayWidthOffSet = StaticTopWidthoffset
-            DayHightOffSet += DayHight
+
+                DayWidthOffSet += DayWidth # adds the correct offset 
+            DayWidthOffSet = StaticTopWidthoffset # resets the day row 
+            DayHightOffSet += DayHight # adds the correct offset 
