@@ -1,6 +1,6 @@
 import tkinter as tk
 from Ui.ColorControlFile import ColorControl
-import math, calendar
+import math, calendar, time
 def RoundToSigN(x, sig=3):
     return round(x, sig - int(math.floor(math.log10(abs(x)))) - 1)
 
@@ -116,3 +116,12 @@ class CreateUiElimants():
             "HitBox": [StaticTopWidthoffset, StaticTopHightOffset, StaticBottomWidthOffset, StaticBottomHightOffset]
         }
         return LittleTempList, BoxSizeData
+
+    def PlaceLargeHand(self, Window, MainCanvas):
+        # gets the amount of seconds we are throuh the day right now 
+        Seconds = (int((int(time.strftime('%H'))*60) + int(time.strftime('%M')))*60) + int(time.strftime('%S'))
+
+        # where should the single large hand go
+        LargeHand = (Window.winfo_height()/86400)*Seconds
+
+        MainCanvas.create_line(10, LargeHand, 340, LargeHand, fill="pink", tag="TheLargeHand")
