@@ -17,7 +17,7 @@ class CreateUiElimants():
         LittleTempList = []
         
         # creates the back ground for day display
-        T1 = MainCanvas.create_rectangle(0, 0, 350, Window.winfo_height(), fill=self.CC.LightBackGroundColor(), outline=self.CC.HighLightColor())
+        T1 = MainCanvas.create_rectangle(0, 0, 350, Window.winfo_height(), fill=self.CC.LightBackGroundColor(), outline=self.CC.HighLightColor(), tag=f"DayDisplayBackGround")
         LittleTempList.append(T1)
         # T2 = MainCanvas.create_line(175, 0, 175, ScreenData.height, fill=self.CC.HighLightColor())
         # LittleTempList.append(T2)
@@ -25,7 +25,7 @@ class CreateUiElimants():
         offset = 0
         for x in range(25):
             # creates a line for each our in the day at a reguler interval
-            T3 = MainCanvas.create_line(10, offset, 340, offset, fill=self.CC.HighLightColor())
+            T3 = MainCanvas.create_line(10, offset, 340, offset, fill=self.CC.HighLightColor(), tag=f"HourLineSeprator{offset}")
             LittleTempList.append(T3)
 
             # adds text to see what the hour is
@@ -33,7 +33,7 @@ class CreateUiElimants():
             Hour = f"{x}"
             if x == 13 or x > 13:
                 Hour = f"{x - 12}"
-            T4 = MainCanvas.create_text(175, offset-7, text=Hour, fill=self.CC.HighLightColor())
+            T4 = MainCanvas.create_text(175, offset-7, text=Hour, fill=self.CC.HighLightColor(), tag=f"HourTextLabel{Hour}")
             offset += HourSepration
             LittleTempList.append(T4)
 
@@ -99,7 +99,9 @@ class CreateUiElimants():
                     DayWidthOffSet, DayHightOffSet, # top left
                     DayWidthOffSet+DayWidth, DayHightOffSet+DayHight, # bottom right 
                     fill=BoxColor, 
-                    outline=self.CC.HighLightColor())
+                    outline=self.CC.HighLightColor(),
+                    tag=f"DaysInTheMonthBox{BoxNumber}{DayNumber}"
+                )
                 LittleTempList.append(T1)
                 # this is a debug text 
                 # MainCanvas.create_text(DayWidthOffSet+(DayWidth/2), DayHightOffSet+(DayHight/2), text=f"box: {BoxNumber} | day: {DayNumber}", fill=self.CC.HighLightColor())
