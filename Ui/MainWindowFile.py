@@ -100,10 +100,20 @@ class CreateUiElimants():
                     DayWidthOffSet+DayWidth, DayHightOffSet+DayHight, # bottom right 
                     fill=BoxColor, 
                     outline=self.CC.HighLightColor(),
-                    tag=f"DaysInTheMonthBox{BoxNumber}{DayNumber}"
+                    tag=f"DaysInTheMonthBox{BoxNumber}"
                 )
                 LittleTempList.append(T1)
+                TextColor = self.CC.HighLightColor() if DayActive else self.CC.DarkBackGroundColor()
+                # adds the number of the day 
+                MainCanvas.create_text(
+                    DayWidthOffSet+(DayWidth/16), 
+                    DayHightOffSet+(DayHight/8), 
+                    text=f"{DayNumber}", 
+                    fill=TextColor,
+                    tag=f"DaysInTheMonthNumber{BoxNumber}"
+                )
                 # this is a debug text 
+
                 # MainCanvas.create_text(DayWidthOffSet+(DayWidth/2), DayHightOffSet+(DayHight/2), text=f"box: {BoxNumber} | day: {DayNumber}", fill=self.CC.HighLightColor())
 
 
@@ -124,7 +134,6 @@ class CreateUiElimants():
             MainCanvas.delete("TitleCard")
 
         font=("KoHo", 20, "bold")
-        print(f"Current time: {time.strftime('%Y-%m-%d %H:%M:%S')}")
         monthplacement = Window.winfo_width()/2
         MainCanvas.create_text(monthplacement, 75, text=time.strftime('%Y-%m-%d %H:%M:%S'), fill=self.CC.HighLightColor(), font=font, tag="TitleCard")
         
