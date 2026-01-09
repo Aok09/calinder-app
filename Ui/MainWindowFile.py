@@ -119,7 +119,14 @@ class CreateUiElimants():
         }
         return LittleTempList, BoxSizeData
 
+    def CreateMonthTitleText(self, Window, MainCanvas):
+        pass
+
     def PlaceLargeHand(self, Window, MainCanvas):
+
+        if bool(MainCanvas.find_withtag("TheLargeHand")):
+            MainCanvas.delete("TheLargeHand")
+
         # gets the amount of seconds we are throuh the day right now 
         Seconds = (int((int(time.strftime('%H'))*60) + int(time.strftime('%M')))*60) + int(time.strftime('%S'))
 
