@@ -1,6 +1,6 @@
 import tkinter as tk
 from Ui.ColorControlFile import ColorControl
-import math
+import math, calendar
 def RoundToSigN(x, sig=3):
     return round(x, sig - int(math.floor(math.log10(abs(x)))) - 1)
 
@@ -70,14 +70,36 @@ class CreateUiElimants():
         DayWidthOffSet = StaticTopWidthoffset
         DayHightOffSet = StaticTopHightOffset
 
+        FistDayOfMonth, MonthLength = calendar.monthrange(2026, 3)
+        print (FistDayOfMonth, MonthLength)
+        BoxNumber = 0
+        DayActive = False
+        DayNumber = 0
         #creates the calnder gird that is 7 across and 6 down
         for Hight in range(6): # how meany weeks to add
             for Width in range(7): # how meany days in a week
+
+                BoxNumber += 1
+                print(BoxNumber)
+
+                if BoxNumber > FistDayOfMonth:
+                    print ("Month is not to short")
+                    DayActive = True
+                    DayNumber += 1
+                    if DayNumber > MonthLength:
+                        print ("month is too long")
+                        DayActive = False
+
+                color = self.CC.LightBackGroundColor() if DayActive else self.CC.DarkBackGroundColor()
+
                 MainCanvas.create_rectangle(
                     DayWidthOffSet, DayHightOffSet, # top left
                     DayWidthOffSet+DayWidth, DayHightOffSet+DayHight, # bottom right 
-                    fill=self.CC.LightBackGroundColor(), 
+                    fill=color, 
                     outline=self.CC.HighLightColor())
+
+                T4 = MainCanvas.create_text(DayWidthOffSet+(DayWidth/2), DayHightOffSet+(DayHight/2), text=f"box: {BoxNumber} | day: {DayNumber}", fill=self.CC.HighLightColor())
+
 
                 DayWidthOffSet += DayWidth # adds the correct offset 
             DayWidthOffSet = StaticTopWidthoffset # resets the day row 
