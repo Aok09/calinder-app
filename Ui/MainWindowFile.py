@@ -1,5 +1,6 @@
 import tkinter as tk
 from Ui.ColorControlFile import ColorControl
+from DataDump.DataControlFile import DataControler
 import math, calendar, time
 def RoundToSigN(x, sig=3):
     return round(x, sig - int(math.floor(math.log10(abs(x)))) - 1)
@@ -9,6 +10,7 @@ class CreateUiElimants():
     def __init__(self):
         print ("imported CreateUiElimants")
         self.CC = ColorControl() # this is the color control 
+        self.DC = DataControler() # this is for data controlling
 
     def EventsToDay(self):
         print ("events ")
@@ -41,6 +43,7 @@ class CreateUiElimants():
 
 
     def BuildMonthDayGrid(self, Window, MainCanvas):
+        WorkingDate = [2026, 1, 0]
         # this entier function only creates 1 thing
         LittleTempList = []
         # the main calinder grid is:
@@ -72,7 +75,7 @@ class CreateUiElimants():
         DayWidthOffSet = StaticTopWidthoffset
         DayHightOffSet = StaticTopHightOffset
 
-        FistDayOfMonth, MonthLength = calendar.monthrange(2026, 3)
+        FistDayOfMonth, MonthLength = calendar.monthrange(WorkingDate[0], WorkingDate[1])
 
         # this part has become very clunky but it works from my limeted testing and will be easy to update a a later date
         BoxNumber = 0 # the box number it self indopedant of the day 
@@ -92,8 +95,23 @@ class CreateUiElimants():
                     if DayNumber > MonthLength:
                         DayActive = False
 
-                # selcets the correct color
-                BoxColor = self.CC.LightBackGroundColor() if DayActive else self.CC.DarkBackGroundColor()
+
+                DaysHoliday = " "
+                if DayActive:
+                    # selcets the correct color
+                    BoxColor = self.CC.LightBackGroundColor()
+                    # text color lol
+                    TextColor = self.CC.HighLightColor()
+
+                    # for now to get things done, the events are going to loaded from here as i cant think of a better place to add them from
+                    WorkingDate[2] = DayNumber
+
+                    DaysHoliday = self.DC.GetHoldaysForDayX(WorkingDate)
+
+                else:
+                    BoxColor = self.CC.DarkBackGroundColor()
+                    TextColor = self.CC.DarkBackGroundColor()
+
                 # creates the box 
                 T1 = MainCanvas.create_rectangle(
                     DayWidthOffSet, DayHightOffSet, # top left
@@ -103,7 +121,8 @@ class CreateUiElimants():
                     tag=f"DaysInTheMonthBox{BoxNumber}"
                 )
                 LittleTempList.append(T1)
-                TextColor = self.CC.HighLightColor() if DayActive else self.CC.DarkBackGroundColor()
+
+                
                 # adds the number of the day 
                 MainCanvas.create_text(
                     DayWidthOffSet+(DayWidth/16), 
@@ -112,9 +131,20 @@ class CreateUiElimants():
                     fill=TextColor,
                     tag=f"DaysInTheMonthNumber{BoxNumber}"
                 )
-                # this is a debug text 
+                
+                MainCanvas.create_text(
+                    DayWidthOffSet+(DayWidth/8), 
+                    DayHightOffSet+(DayHight/8), 
+                    text=DaysHoliday, 
+                    anchor="w",
+                    fill="pink",
+                    tag=f"DaysInTheMonthHoliday{BoxNumber}"
+                )
 
+                
+                # this is a debug text 
                 # MainCanvas.create_text(DayWidthOffSet+(DayWidth/2), DayHightOffSet+(DayHight/2), text=f"box: {BoxNumber} | day: {DayNumber}", fill=self.CC.HighLightColor())
+
 
 
                 DayWidthOffSet += DayWidth # adds the correct offset 
