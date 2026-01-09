@@ -41,6 +41,8 @@ class CreateUiElimants():
 
 
     def BuildMonthDayGrid(self, Window, MainCanvas):
+        # this entier function only creates 1 thing
+        LittleTempList = []
         # the main calinder grid is:
         # top left: 360 x 150 - to give space for the title/month or what ever
         # the bottem right: the window size -10 in both directions  
@@ -71,36 +73,46 @@ class CreateUiElimants():
         DayHightOffSet = StaticTopHightOffset
 
         FistDayOfMonth, MonthLength = calendar.monthrange(2026, 3)
-        print (FistDayOfMonth, MonthLength)
-        BoxNumber = 0
-        DayActive = False
-        DayNumber = 0
+
+        # this part has become very clunky but it works from my limeted testing and will be easy to update a a later date
+        BoxNumber = 0 # the box number it self indopedant of the day 
+        DayActive = False # is the day in the month or not 
+        DayNumber = 0 # this is the actual in month day
+
         #creates the calnder gird that is 7 across and 6 down
         for Hight in range(6): # how meany weeks to add
             for Width in range(7): # how meany days in a week
 
-                BoxNumber += 1
-                print(BoxNumber)
 
-                if BoxNumber > FistDayOfMonth:
-                    print ("Month is not to short")
+                # this is the part that checks if the day is in the month
+                BoxNumber += 1
+                if BoxNumber > FistDayOfMonth: 
                     DayActive = True
                     DayNumber += 1
                     if DayNumber > MonthLength:
-                        print ("month is too long")
                         DayActive = False
 
-                color = self.CC.LightBackGroundColor() if DayActive else self.CC.DarkBackGroundColor()
-
-                MainCanvas.create_rectangle(
+                # selcets the correct color
+                BoxColor = self.CC.LightBackGroundColor() if DayActive else self.CC.DarkBackGroundColor()
+                # creates the box 
+                T1 = MainCanvas.create_rectangle(
                     DayWidthOffSet, DayHightOffSet, # top left
                     DayWidthOffSet+DayWidth, DayHightOffSet+DayHight, # bottom right 
-                    fill=color, 
+                    fill=BoxColor, 
                     outline=self.CC.HighLightColor())
-
-                T4 = MainCanvas.create_text(DayWidthOffSet+(DayWidth/2), DayHightOffSet+(DayHight/2), text=f"box: {BoxNumber} | day: {DayNumber}", fill=self.CC.HighLightColor())
+                LittleTempList.append(T1)
+                # this is a debug text 
+                # MainCanvas.create_text(DayWidthOffSet+(DayWidth/2), DayHightOffSet+(DayHight/2), text=f"box: {BoxNumber} | day: {DayNumber}", fill=self.CC.HighLightColor())
 
 
                 DayWidthOffSet += DayWidth # adds the correct offset 
             DayWidthOffSet = StaticTopWidthoffset # resets the day row 
             DayHightOffSet += DayHight # adds the correct offset 
+        
+        # packs the box size and off set
+        BoxSizeData = {
+            "Width": DayWidth,
+            "Hight": DayHight,
+            "HitBox": [StaticTopWidthoffset, StaticTopHightOffset, StaticBottomWidthOffset, StaticBottomHightOffset]
+        }
+        return LittleTempList, BoxSizeData
