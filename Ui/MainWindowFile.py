@@ -119,8 +119,15 @@ class CreateUiElimants():
         }
         return LittleTempList, BoxSizeData
 
-    def CreateMonthTitleText(self, Window, MainCanvas):
-        pass
+    def CreateCorrectTittles(self, Window, MainCanvas):
+        if bool(MainCanvas.find_withtag("TitleCard")):
+            MainCanvas.delete("TitleCard")
+
+        font=("KoHo", 20, "bold")
+        print(f"Current time: {time.strftime('%Y-%m-%d %H:%M:%S')}")
+        monthplacement = Window.winfo_width()/2
+        MainCanvas.create_text(monthplacement, 75, text=time.strftime('%Y-%m-%d %H:%M:%S'), fill=self.CC.HighLightColor(), font=font, tag="TitleCard")
+        
 
     def PlaceLargeHand(self, Window, MainCanvas):
 

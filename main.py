@@ -30,15 +30,23 @@ class MainWindow(tk.Tk):
         print ("run start")
         self.ElemntBuilder.BuildDayEvents(self, self.CalinderCanvas) # creates the side bar to view the the events of today
         self.ElemntBuilder.BuildMonthDayGrid(self, self.CalinderCanvas) 
-        self.ElemntBuilder.CreateMonthTitleText(self, self.CalinderCanvas)
 
         # places the hand on todays events display
         self.after(1, self.PlaceingTheLargeHandLoop)
+        
+        # places the the clock and titles
+        self.after(500, self.UpdateClockAndTitle)
 
 
     def PlaceingTheLargeHandLoop(self):
         self.after(60000, self.PlaceingTheLargeHandLoop)
         self.ElemntBuilder.PlaceLargeHand(self, self.CalinderCanvas)
+
+    def UpdateClockAndTitle(self):
+        self.ElemntBuilder.CreateCorrectTittles(self, self.CalinderCanvas)
+        TimeTillUpdate = ((1-(time.time()%1))*1000)+70
+        print (TimeTillUpdate)
+        self.after(int(TimeTillUpdate), self.UpdateClockAndTitle)
 
 
 MainWindow()
