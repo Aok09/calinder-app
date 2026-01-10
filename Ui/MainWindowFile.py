@@ -22,7 +22,7 @@ class CreateUiElimants():
         LittleTempList = []
         
         # creates the back ground for day display
-        T1 = MainCanvas.create_rectangle(0, 0, 350, Window.winfo_height(), fill=self.CC.LightBackGroundColor(), outline=self.CC.HighLightColor(), tag=f"DayDisplayBackGround")
+        T1 = MainCanvas.create_rectangle(10, 0, 350, Window.winfo_height(), fill=self.CC.LightBackGroundColor(), outline=self.CC.HighLightColor(), tag=f"DayDisplayBackGround")
         LittleTempList.append(T1)
         # T2 = MainCanvas.create_line(175, 0, 175, ScreenData.height, fill=self.CC.HighLightColor())
         # LittleTempList.append(T2)
@@ -30,7 +30,7 @@ class CreateUiElimants():
         offset = 0
         for x in range(25):
             # creates a line for each our in the day at a reguler interval
-            T3 = MainCanvas.create_line(10, offset, 340, offset, fill=self.CC.HighLightColor(), tag=f"HourLineSeprator{offset}")
+            T3 = MainCanvas.create_line(20, offset, 340, offset, fill=self.CC.HighLightColor(), tag=f"HourLineSeprator{offset}")
             LittleTempList.append(T3)
 
             # adds text to see what the hour is
@@ -41,8 +41,8 @@ class CreateUiElimants():
             T4 = MainCanvas.create_text(175, offset-7, text=Hour, fill=self.CC.HighLightColor(), tag=f"HourTextLabel{Hour}")
             offset += HourSepration
             LittleTempList.append(T4)
-
-        return LittleTempList
+        
+        return {"DayEventsBackingIds": LittleTempList, "HitBox": [10, 0, 350, Window.winfo_height()]}
 
 
     def BuildMonthDayGrid(self, Window, MainCanvas):
@@ -231,6 +231,6 @@ class CreateUiElimants():
         # where should the single large hand go
         LargeHand = (Window.winfo_height()/86400)*Seconds
 
-        TheHand = MainCanvas.create_line(10, LargeHand, 340, LargeHand, fill="pink", tag="TheLargeHand")
+        TheHand = MainCanvas.create_line(20, LargeHand, 340, LargeHand, fill="pink", tag="TheLargeHand")
 
-        return TheHand, [10, LargeHand, 340, LargeHand]
+        return TheHand, [20, LargeHand, 340, LargeHand]
