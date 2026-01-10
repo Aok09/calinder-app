@@ -1,5 +1,6 @@
 from screeninfo import get_monitors
 import tkinter as tk
+from datetime import date
 import time
 
 from Ui.ColorControlFile import ColorControl
@@ -10,12 +11,15 @@ from Ui.MouseEventHandlerFile import MouseEventHandler
 class MainWindow(tk.Tk):
     """docstring for MainWindow"""
     def __init__(self):
+
         super().__init__() # this is what tels the class to use tk
+
         self.CC = ColorControl() # this is the color control 
         self.MEH = MouseEventHandler()
-
         self.ElemntBuilder = CreateUiElimants()
+
         self.Monitor = get_monitors()[0] # gets the second monitor
+        self.WorkingDate = [int(date.today().year), int(str(date.today().month)), int(date.today().day)]
 
 
         self.RenderdOnScreen = {}
@@ -30,6 +34,8 @@ class MainWindow(tk.Tk):
 
         self.bind("<Button-1>", self.OnClick)
         self.bind("<Motion>", self.MouseMoved)
+        self.bind("<MouseWheel>", self.ScrollWheel)
+
         self.after(1, self.OnStart)
         self.mainloop()
 
@@ -39,8 +45,12 @@ class MainWindow(tk.Tk):
         
         EventsToday = self.ElemntBuilder.BuildDayEvents(self, self.CalinderCanvas) # creates the side bar to view the the events of today
         self.RenderdOnScreen["EventsOfToday"] = EventsToday
-        CalinderGrid = self.ElemntBuilder.BuildMonthDayGrid(self, self.CalinderCanvas) 
+
+
+        CalinderGrid = self.ElemntBuilder.BuildMonthDayGrid(self, self.CalinderCanvas, self.WorkingDate) 
         self.RenderdOnScreen["CalinderGrid"] = CalinderGrid
+
+
         # places the hand on todays events display
         self.after(1, self.PlaceingTheLargeHandLoop)
         
@@ -52,18 +62,21 @@ class MainWindow(tk.Tk):
         self.after(60000, self.PlaceingTheLargeHandLoop)
         WhereHand = self.ElemntBuilder.PlaceLargeHand(self, self.CalinderCanvas)
         self.RenderdOnScreen["TheLargeHand"] = [WhereHand]
-        print(WhereHand)
 
     def UpdateClockAndTitle(self):
-        self.ElemntBuilder.CreateCorrectTittles(self, self.CalinderCanvas)
+        self.ElemntBuilder.CreateCorrectTittles(self, self.CalinderCanvas, self.WorkingDate)
         TimeTillUpdate = ((1-(time.time()%1))*1000)+70
         self.after(int(TimeTillUpdate), self.UpdateClockAndTitle)
 
     def MouseMoved(self, event):
         # return
-        self.MEH.WhereIsMouse(event, self.RenderdOnScreen)
+        HoveringOver = self.MEH.WhereIsMouse(event, self.RenderdOnScreen)
 
     def OnClick(self, event):
-        self.MEH.WhereIsMouse(event, self.RenderdOnScreen)
+        ClickingOn = self.MEH.WhereIsMouse(event, self.RenderdOnScreen)
+    
+    def ScrollWheel(self, event):
+        ScrollingOn = self.MEH.WhereIsMouse(event, self.RenderdOnScreen)
+        print(ScrollingOn)
 
 MainWindow()

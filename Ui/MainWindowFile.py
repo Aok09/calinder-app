@@ -16,7 +16,7 @@ class CreateUiElimants():
         self.FC = FontControl() # is for well font control
 
     def EventsToDay(self):
-        print ("events ")
+        pass
 
     def BuildDayEvents(self, Window, MainCanvas):
         LittleTempList = []
@@ -45,8 +45,7 @@ class CreateUiElimants():
         return {"DayEventsBackingIds": LittleTempList, "HitBox": [10, 0, 350, Window.winfo_height()]}
 
 
-    def BuildMonthDayGrid(self, Window, MainCanvas):
-        WorkingDate = [2026, 1, 0]
+    def BuildMonthDayGrid(self, Window, MainCanvas, WorkingDate):
         # this entier function only creates 1 thing
         LittleTempList = []
         # the main calinder grid is:
@@ -176,9 +175,9 @@ class CreateUiElimants():
 
         return BoxSizeData 
 
-    def CreateCorrectTittles(self, Window, MainCanvas):
+    def CreateCorrectTittles(self, Window, MainCanvas, WorkingDate):
         
-        WorkingMonth = 1
+    
         # is there allready a title month 
         if bool(MainCanvas.find_withtag("TitleCard")):
             MainCanvas.delete("TitleCard")
@@ -187,8 +186,8 @@ class CreateUiElimants():
 
         monthplacement = (Window.winfo_width()/2)+350/4
         # time.strftime('%Y-%m-%d %H:%M:%S')
-        Month = (str(calendar.month_name[WorkingMonth])).upper()
-        Month = f"->{Month}<-" if WorkingMonth == int(time.strftime("%m")) else Month
+        Month = (str(calendar.month_name[int(WorkingDate[1])])).upper()
+        Month = f"->{Month}<-" if WorkingDate[1] == int(time.strftime("%m")) else Month
 
         MainCanvas.create_text(
             monthplacement, 75, 
