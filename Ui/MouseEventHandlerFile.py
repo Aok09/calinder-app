@@ -11,31 +11,37 @@ class MouseEventHandler:
             if MouseIsStillHere:
                 return self.MouseWasOver
         
+
         # checks if the mouse is in the calinder grid
         LCGB = ScreenCordanteData["CalinderGrid"]["HitBox"]
         OverCalinderGrid = LCGB[0] < event.x < LCGB[2] and LCGB[1] < event.y < LCGB[3]
-        if OverCalinderGrid:
+        if OverCalinderGrid: 
+            # if the mouse is over the calinder then kick it over to the thing
             self.WhatDayIsTheMouseOver(ScreenCordanteData, event)
-
+        
+        # checks if the mouse is over events of the day 
         LCGB = ScreenCordanteData["EventsOfToday"]["HitBox"]
         OverEventsOfToday = LCGB[0] < event.x < LCGB[2] and LCGB[1] < event.y < LCGB[3]
         if OverEventsOfToday:
+            # if it is then its kicked over to the be dealth with over there 
             self.WhatEventIsTheMouseOver(ScreenCordanteData, event)
 
+        # checks all and if all are false then it is set back to None
         if not OverCalinderGrid and not OverEventsOfToday:
             self.MouseWasOver = None
         
         return self.MouseWasOver
     def WhatDayIsTheMouseOver(self, ScreenCordanteData, event):
-
         DOD = ScreenCordanteData["CalinderGrid"]["TheDayArray"]
         Searching  = False
         while True:
+            # checks all the days 
             for Day in DOD:
+                # cehcks each day in tern
                 Outer = ScreenCordanteData["CalinderGrid"]["TheDayArray"][Day]["MainBox"]
                 Found = Outer[0] < event.x < Outer[2] and Outer[1] < event.y < Outer[3]
 
-                if Found:
+                if Found: # if is the day then it sets it and returns to the main function
                     self.MouseWasOver = Outer
                     return
 
@@ -43,5 +49,6 @@ class MouseEventHandler:
             return
 
     def WhatEventIsTheMouseOver(self, ScreenCordanteData, event):
+        # no data to handle at the moment so just sets it as the main box and thats it
         self.MouseWasOver = ScreenCordanteData["EventsOfToday"]["HitBox"]
         pass
