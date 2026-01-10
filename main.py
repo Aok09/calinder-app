@@ -1,16 +1,17 @@
 from screeninfo import get_monitors
 import tkinter as tk
+import time
 
 from Ui.ColorControlFile import ColorControl
-from Ui.MainWindowFile import CreateUiElimants as Eliment
+from Ui.MainWindowFile import CreateUiElimants
+from Ui.FontControlFile import FontControl
 
-import time
 class MainWindow(tk.Tk):
     """docstring for MainWindow"""
     def __init__(self):
         super().__init__() # this is what tels the class to use tk
         self.CC = ColorControl() # this is the color control 
-        self.ElemntBuilder = Eliment()
+        self.ElemntBuilder = CreateUiElimants()
         self.Monitor = get_monitors()[0] # gets the second monitor
 
 
@@ -45,7 +46,6 @@ class MainWindow(tk.Tk):
     def UpdateClockAndTitle(self):
         self.ElemntBuilder.CreateCorrectTittles(self, self.CalinderCanvas)
         TimeTillUpdate = ((1-(time.time()%1))*1000)+70
-        print (TimeTillUpdate)
         self.after(int(TimeTillUpdate), self.UpdateClockAndTitle)
 
 
