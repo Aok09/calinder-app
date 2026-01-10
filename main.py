@@ -35,7 +35,10 @@ class MainWindow(tk.Tk):
 
     def OnStart(self):
         print ("run start")
-        self.ElemntBuilder.BuildDayEvents(self, self.CalinderCanvas) # creates the side bar to view the the events of today
+
+        
+        EventsToday = self.ElemntBuilder.BuildDayEvents(self, self.CalinderCanvas) # creates the side bar to view the the events of today
+        self.RenderdOnScreen["EventsOfToday"] = EventsToday
         CalinderGrid = self.ElemntBuilder.BuildMonthDayGrid(self, self.CalinderCanvas) 
         self.RenderdOnScreen["CalinderGrid"] = CalinderGrid
         # places the hand on todays events display
@@ -57,7 +60,7 @@ class MainWindow(tk.Tk):
         self.after(int(TimeTillUpdate), self.UpdateClockAndTitle)
 
     def MouseMoved(self, event):
-        return
+        # return
         self.MEH.WhereIsMouse(event, self.RenderdOnScreen)
 
     def OnClick(self, event):

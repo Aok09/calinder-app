@@ -16,7 +16,12 @@ class MouseEventHandler:
         OverCalinderGrid = LCGB[0] < event.x < LCGB[2] and LCGB[1] < event.y < LCGB[3]
         if OverCalinderGrid:
             self.WhatDayIsTheMouseOver(ScreenCordanteData, event)
-            
+
+        LCGB = ScreenCordanteData["EventsOfToday"]["HitBox"]
+        OverEventsOfToday = LCGB[0] < event.x < LCGB[2] and LCGB[1] < event.y < LCGB[3]
+        if OverEventsOfToday:
+            self.WhatEventIsTheMouseOver(ScreenCordanteData, event)
+
         else:
             self.MouseWasOver = None
         
@@ -36,3 +41,6 @@ class MouseEventHandler:
 
             self.MouseWasOver = None
             return
+
+    def WhatEventIsTheMouseOver(self, ScreenCordanteData, event):
+        pass
