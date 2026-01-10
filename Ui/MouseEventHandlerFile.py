@@ -22,7 +22,7 @@ class MouseEventHandler:
         if OverEventsOfToday:
             self.WhatEventIsTheMouseOver(ScreenCordanteData, event)
 
-        else:
+        if not OverCalinderGrid and not OverEventsOfToday:
             self.MouseWasOver = None
         
         return self.MouseWasOver
@@ -43,4 +43,5 @@ class MouseEventHandler:
             return
 
     def WhatEventIsTheMouseOver(self, ScreenCordanteData, event):
+        self.MouseWasOver = ScreenCordanteData["EventsOfToday"]["HitBox"]
         pass
