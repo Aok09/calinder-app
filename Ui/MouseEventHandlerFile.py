@@ -1,23 +1,41 @@
 class MouseEventHandler:
     def __init__ (self):
         print("mouse")
+        self.MouseWasOver = None
+        self.MouseIsOver = None
     def WhereIsMouse(self, event, ScreenCordanteData):
+
+        # checks if the mouse is still over the thing from last time 
+        # if it is just return what it found the last time
+        if self.MouseWasOver is not None:
+            MouseIsStillHere = self.MouseWasOver[0] < event.x < self.MouseWasOver[2] and self.MouseWasOver[1] < event.y < self.MouseWasOver[3]
+            if MouseIsStillHere:
+                return self.MouseWasOver
+        
+        # checks if the mouse is in the calinder grid
         LCGB = ScreenCordanteData["CalinderGrid"][1]["HitBox"]
-        # print (LCGB, event)
-        OverCalinderGrid = bool(LCGB[0] < event.x) and bool(LCGB[2] > event.x) and bool(LCGB[1] < event.y) and bool(LCGB[3] > event.y)
-        print(OverCalinderGrid)
+        OverCalinderGrid = LCGB[0] < event.x < LCGB[2] and LCGB[1] < event.y < LCGB[3]
         if OverCalinderGrid:
-            DOD = ScreenCordanteData["CalinderGrid"][1]["TheDayArray"]
-
-            Found = False
-            while not Found:
-                for Day in DOD:
-                    Outer = ScreenCordanteData["CalinderGrid"][1]["TheDayArray"][Day]["MainBox"]
-                    Found = bool(Outer[0] < event.x) and bool(Outer[2] > event.x) and bool(Outer[1] < event.y) and bool(Outer[3] > event.y)  
-
-                    if Found:
-                        break
-                        
-                break
+            print ("the mouse is over the calinder")
+            self.WhatDayIsTheMouseOver(ScreenCordanteData, event)
             
-            print(Day)
+        else:
+            self.MouseWasOver = None
+        
+        return self.MouseWasOver
+    def WhatDayIsTheMouseOver(self, ScreenCordanteData, event):
+
+        DOD = ScreenCordanteData["CalinderGrid"][1]["TheDayArray"]
+
+        Searching  = False
+        while True:
+            for Day in DOD:
+                Outer = ScreenCordanteData["CalinderGrid"][1]["TheDayArray"][Day]["MainBox"]
+                Found = Outer[0] < event.x < Outer[2] and Outer[1] < event.y < Outer[3]
+
+                if Found:
+                    self.MouseWasOver = Outer
+                    return
+
+            self.MouseWasOver = None
+            return
