@@ -19,9 +19,10 @@ class MainWindow(tk.Tk):
         self.ElemntBuilder = CreateUiElimants()
 
         self.Monitor = get_monitors()[0] # gets the second monitor
-        self.WorkingDate = [int(date.today().year), int(str(date.today().month)), int(date.today().day)]
-
-
+        self.WorkingDate = [int(date.today().year), int(date.today().month), int(date.today().day)]
+        print (f"year: {date.today().year}")
+        print (f"month: {date.today().month}")
+        print (f"day: {date.today().day}")
         self.RenderdOnScreen = {}
         self.ToBeRenderdOnScreen = []
         # creates the window and places it on the second screen
@@ -78,5 +79,15 @@ class MainWindow(tk.Tk):
     def ScrollWheel(self, event):
         ScrollingOn = self.MEH.WhereIsMouse(event, self.RenderdOnScreen)
         print(ScrollingOn)
+        
+        # if scrolling on the main calinder view
+        if ScrollingOn["WhatIsOn"][0] == True:
+            print (event)
+            UporDown = 1 if event.delta == 120 else -1
+            self.WorkingDate[1] = int(self.WorkingDate[1]) + UporDown 
+            CalinderGrid = self.ElemntBuilder.BuildMonthDayGrid(self, self.CalinderCanvas, self.WorkingDate) 
+            self.ElemntBuilder.CreateCorrectTittles(self, self.CalinderCanvas, self.WorkingDate)
+
+            self.RenderdOnScreen["CalinderGrid"] = CalinderGrid
 
 MainWindow()
