@@ -5,6 +5,7 @@ class MouseEventHandler:
         self.MouseIsOver = None
         self.OverCalinderGrid = False
         self.OverEventsOfToday = False
+        self.OnDeatails = None
 
     def WhereIsMouse(self, event, ScreenCordanteData):
         # checks if the mouse is still over the thing from last time 
@@ -12,7 +13,7 @@ class MouseEventHandler:
         if self.MouseWasOver is not None:
             MouseIsStillHere = self.MouseWasOver[0] < event.x < self.MouseWasOver[2] and self.MouseWasOver[1] < event.y < self.MouseWasOver[3]
             if MouseIsStillHere:
-                return {"Outline": self.MouseWasOver, "WhatIsOn": [self.OverCalinderGrid, self.OverEventsOfToday]} 
+                return {"Outline": self.MouseWasOver, "WhatIsOn": [self.OverCalinderGrid, self.OverEventsOfToday], "Deatils": self.OnDeatails} 
         
 
         # checks if the mouse is in the calinder grid
@@ -33,7 +34,7 @@ class MouseEventHandler:
         if not self.OverCalinderGrid and not self.OverEventsOfToday:
             self.MouseWasOver = None
         
-        return {"Outline": self.MouseWasOver, "WhatIsOn": [self.OverCalinderGrid, self.OverEventsOfToday]} 
+        return {"Outline": self.MouseWasOver, "WhatIsOn": [self.OverCalinderGrid, self.OverEventsOfToday], "Deatils": self.OnDeatails} 
     def WhatDayIsTheMouseOver(self, ScreenCordanteData, event):
         DOD = ScreenCordanteData["CalinderGrid"]["TheDayArray"]
         Searching  = False
@@ -46,6 +47,7 @@ class MouseEventHandler:
 
                 if Found: # if is the day then it sets it and returns to the main function
                     self.MouseWasOver = Outer
+                    self.OnDeatails = ScreenCordanteData["CalinderGrid"]["TheDayArray"][Day]
                     return
 
             self.MouseWasOver = None
