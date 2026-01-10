@@ -85,6 +85,8 @@ class CreateUiElimants():
         DayActive = False # is the day in the month or not 
         DayNumber = 0 # this is the actual in month day
 
+        TheDaysMade = {}
+
         #creates the calnder gird that is 7 across and 6 down
         for Hight in range(6): # how meany weeks to add
             for Width in range(7): # how meany days in a week
@@ -121,7 +123,7 @@ class CreateUiElimants():
                     DayWidthOffSet+DayWidth, DayHightOffSet+DayHight, # bottom right 
                     fill=BoxColor, 
                     outline=self.CC.HighLightColor(),
-                    tag=f"DaysInTheMonthBox{BoxNumber}"
+                    tags=(f"DaysInTheMonthBox{BoxNumber}", "TheCalinderGrid", "RenderdOnScreen")
                 )
                 LittleTempList.append(T1)
 
@@ -132,18 +134,25 @@ class CreateUiElimants():
                     DayHightOffSet+(DayHight/8), 
                     text=f"{DayNumber}", 
                     fill=TextColor,
-                    tag=f"DaysInTheMonthNumber{BoxNumber}"
+                    tags=(f"DaysInTheMonthNumber{BoxNumber}", "TheCalinderGrid", "RenderdOnScreen")
                 )
                 
+                # this is the text that adds the holiday if there is one
                 MainCanvas.create_text(
                     DayWidthOffSet+(DayWidth/8), 
                     DayHightOffSet+(DayHight/8), 
                     text=DaysHoliday, 
                     anchor="w",
                     fill="pink",
-                    tag=f"DaysInTheMonthHoliday{BoxNumber}"
+                    tags=(f"DaysInTheMonthHoliday{BoxNumber}", "TheCalinderGrid", "RenderdOnScreen")
                 )
-
+                
+                # packs all the data for the day into 1 thing so the mouse knows where it is and what it needs to do
+                TheDaysMade[BoxNumber] = {
+                    "MainBox": [DayWidthOffSet, DayHightOffSet, DayWidthOffSet+DayWidth, DayHightOffSet+DayHight], 
+                    "DayText": [DayWidthOffSet+(DayWidth/16), DayHightOffSet+(DayHight/8)],
+                    "holidayText": [DayWidthOffSet+(DayWidth/8), DayHightOffSet+(DayHight/8)]
+                    }
                 
                 # this is a debug text 
                 # MainCanvas.create_text(DayWidthOffSet+(DayWidth/2), DayHightOffSet+(DayHight/2), text=f"box: {BoxNumber} | day: {DayNumber}", fill=self.CC.HighLightColor())
@@ -158,9 +167,12 @@ class CreateUiElimants():
         BoxSizeData = {
             "Width": DayWidth,
             "Hight": DayHight,
-            "HitBox": [StaticTopWidthoffset, StaticTopHightOffset, StaticBottomWidthOffset, StaticBottomHightOffset]
+            "HitBox": [StaticTopWidthoffset, StaticTopHightOffset, StaticBottomWidthOffset, StaticBottomHightOffset],
+            "TheDayArray": TheDaysMade # a dict of each day box 
         }
-        return LittleTempList, BoxSizeData, 
+        # MainCanvas.create_rectangle(StaticTopWidthoffset, StaticTopHightOffset, StaticBottomWidthOffset, StaticBottomHightOffset, fill="red", outline="pink")
+
+        return LittleTempList, BoxSizeData 
 
     def CreateCorrectTittles(self, Window, MainCanvas):
         
@@ -189,7 +201,7 @@ class CreateUiElimants():
             text=time.strftime('%Y-%m-%d'), 
             fill=self.CC.HighLightColor(), 
             font=self.FC.TimeFont(), 
-            tag="TitleCard", 
+            tag="TitleCard",
             anchor="w"
         )
 
@@ -198,7 +210,7 @@ class CreateUiElimants():
             text=time.strftime('%H:%M:%S'), 
             fill=self.CC.HighLightColor(), 
             font=self.FC.TimeFont(), 
-            tag="TitleCard", 
+            tag="TitleCard",
             anchor="w"
         )
 
@@ -217,4 +229,6 @@ class CreateUiElimants():
         # where should the single large hand go
         LargeHand = (Window.winfo_height()/86400)*Seconds
 
-        MainCanvas.create_line(10, LargeHand, 340, LargeHand, fill="pink", tag="TheLargeHand")
+        TheHand = MainCanvas.create_line(10, LargeHand, 340, LargeHand, fill="pink", tag="TheLargeHand")
+
+        return TheHand, [10, LargeHand, 340, LargeHand]
