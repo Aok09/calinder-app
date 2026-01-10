@@ -151,7 +151,8 @@ class CreateUiElimants():
                 TheDaysMade[BoxNumber] = {
                     "MainBox": [DayWidthOffSet, DayHightOffSet, DayWidthOffSet+DayWidth, DayHightOffSet+DayHight], 
                     "DayText": [DayWidthOffSet+(DayWidth/16), DayHightOffSet+(DayHight/8)],
-                    "holidayText": [DayWidthOffSet+(DayWidth/8), DayHightOffSet+(DayHight/8)]
+                    "holidayText": [DayWidthOffSet+(DayWidth/8), DayHightOffSet+(DayHight/8)], 
+                    "DayData": {"events": [None], "Holiday": DaysHoliday, "DaysDate": DayNumber}
                     }
                 
                 # this is a debug text 
@@ -165,6 +166,7 @@ class CreateUiElimants():
         
         # packs the box size and off set
         BoxSizeData = {
+            "TheLittleList": LittleTempList,
             "Width": DayWidth,
             "Hight": DayHight,
             "HitBox": [StaticTopWidthoffset, StaticTopHightOffset, StaticBottomWidthOffset, StaticBottomHightOffset],
@@ -172,7 +174,7 @@ class CreateUiElimants():
         }
         # MainCanvas.create_rectangle(StaticTopWidthoffset, StaticTopHightOffset, StaticBottomWidthOffset, StaticBottomHightOffset, fill="red", outline="pink")
 
-        return LittleTempList, BoxSizeData 
+        return BoxSizeData 
 
     def CreateCorrectTittles(self, Window, MainCanvas):
         
