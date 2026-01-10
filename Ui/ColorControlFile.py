@@ -8,3 +8,6 @@ class ColorControl:
 
     def HighLightColor(self):
         return "#00becc"
+    
+    def LookAtMeColor(self):
+        return "#EFBF04"
