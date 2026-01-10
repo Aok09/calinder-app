@@ -1,6 +1,8 @@
 import tkinter as tk
 from Ui.ColorControlFile import ColorControl
 from DataDump.DataControlFile import DataControler
+from Ui.FontControlFile import FontControl
+
 import math, calendar, time
 def RoundToSigN(x, sig=3):
     return round(x, sig - int(math.floor(math.log10(abs(x)))) - 1)
@@ -11,6 +13,7 @@ class CreateUiElimants():
         print ("imported CreateUiElimants")
         self.CC = ColorControl() # this is the color control 
         self.DC = DataControler() # this is for data controlling
+        self.FC = FontControl() # is for well font control
 
     def EventsToDay(self):
         print ("events ")
@@ -157,15 +160,50 @@ class CreateUiElimants():
             "Hight": DayHight,
             "HitBox": [StaticTopWidthoffset, StaticTopHightOffset, StaticBottomWidthOffset, StaticBottomHightOffset]
         }
-        return LittleTempList, BoxSizeData
+        return LittleTempList, BoxSizeData, 
 
     def CreateCorrectTittles(self, Window, MainCanvas):
+        
+        WorkingMonth = 1
+        # is there allready a title month 
         if bool(MainCanvas.find_withtag("TitleCard")):
             MainCanvas.delete("TitleCard")
 
-        font=("KoHo", 20, "bold")
-        monthplacement = Window.winfo_width()/2
-        MainCanvas.create_text(monthplacement, 75, text=time.strftime('%Y-%m-%d %H:%M:%S'), fill=self.CC.HighLightColor(), font=font, tag="TitleCard")
+
+
+        monthplacement = (Window.winfo_width()/2)+350/4
+        # time.strftime('%Y-%m-%d %H:%M:%S')
+        Month = (str(calendar.month_name[WorkingMonth])).upper()
+        Month = f"->{Month}<-" if WorkingMonth == int(time.strftime("%m")) else Month
+
+        MainCanvas.create_text(
+            monthplacement, 75, 
+            text=Month, 
+            fill=self.CC.HighLightColor(), 
+            font=self.FC.TitleFont(), 
+            tag="TitleCard"
+        )
+
+        MainCanvas.create_text(
+            360, 25, 
+            text=time.strftime('%Y-%m-%d'), 
+            fill=self.CC.HighLightColor(), 
+            font=self.FC.TimeFont(), 
+            tag="TitleCard", 
+            anchor="w"
+        )
+
+        MainCanvas.create_text(
+            360, 55, 
+            text=time.strftime('%H:%M:%S'), 
+            fill=self.CC.HighLightColor(), 
+            font=self.FC.TimeFont(), 
+            tag="TitleCard", 
+            anchor="w"
+        )
+
+
+        
         
 
     def PlaceLargeHand(self, Window, MainCanvas):
