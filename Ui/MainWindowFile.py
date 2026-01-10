@@ -46,6 +46,9 @@ class CreateUiElimants():
 
 
     def BuildMonthDayGrid(self, Window, MainCanvas, WorkingDate):
+        if bool(MainCanvas.find_withtag("TiTheCalinderGridtleCard")):
+            MainCanvas.delete("TheCalinderGrid")
+
         # this entier function only creates 1 thing
         LittleTempList = []
         # the main calinder grid is:
