@@ -4,7 +4,7 @@ class DataControler:
         # grabs the path to THIS file 
         self.ScriptDir = os.path.dirname(os.path.abspath(__file__))
         
-        with open(os.path.join(self.ScriptDir, "UkHolidaysNewFile.json"), "r") as File:
+        with open(os.path.join(self.ScriptDir, "Holidays\\UkHolidaysNewFile.json"), "r") as File:
             self.UkHolidays = json.load(File)
 
 
