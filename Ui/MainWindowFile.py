@@ -106,6 +106,7 @@ class CreateUiElimants():
 
 
                 DaysHoliday = " "
+                DaysActivtys = False
                 if DayActive:
                     # selcets the correct color
                     BoxColor = self.CC.LightBackGroundColor()
@@ -116,10 +117,12 @@ class CreateUiElimants():
                     TempDate[2] = DayNumber
 
                     DaysHoliday = self.DC.GetHoldaysForDayX(TempDate)
+                    DaysActivtys = self.DC.GetDayEvents(TempDate)
 
                 else:
                     BoxColor = self.CC.DarkBackGroundColor()
                     TextColor = self.CC.DarkBackGroundColor()
+
 
                 # creates the box 
                 T1 = MainCanvas.create_rectangle(
@@ -151,6 +154,21 @@ class CreateUiElimants():
                     tags=(f"DaysInTheMonthHoliday{BoxNumber}", "TheCalinderGrid", "RenderdOnScreen")
                 )
                 
+                if DaysActivtys:
+                    AmountRenderd = 0
+                    for Activity in DaysActivtys:
+                        print (Activity)
+                        MainCanvas.create_text(
+                            DayWidthOffSet+(DayWidth/16), 
+                            DayHightOffSet+(DayHight/4)+((DayHight/8)*AmountRenderd), 
+                            text=DaysActivtys[Activity]["EventTitle"], 
+                            anchor="w",
+                            fill="pink",
+                            tags=(f"DaysInTheMonthHoliday{BoxNumber}", "TheCalinderGrid", "RenderdOnScreen")
+                        )
+                        AmountRenderd += 1
+
+
                 # packs all the data for the day into 1 thing so the mouse knows where it is and what it needs to do
                 TheDaysMade[BoxNumber] = {
                     "MainBox": [DayWidthOffSet, DayHightOffSet, DayWidthOffSet+DayWidth, DayHightOffSet+DayHight], 
