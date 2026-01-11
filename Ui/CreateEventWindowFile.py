@@ -1,8 +1,12 @@
 from screeninfo import get_monitors
+from datetime import datetime
+
 import tkinter as tk
 import time, calendar, inspect, copy
-from datetime import datetime
+
 from Ui.ColorControlFile import ColorControl
+from DataDump.DataControlFile import DataControler
+
 
 class CreateEventWindow(tk.Tk):
     def __init__(self, WorkingDate, InputData, StartTime=[datetime.now().hour, datetime.now().minute], EndTime=[datetime.now().hour, datetime.now().minute]):
@@ -21,6 +25,7 @@ class CreateEventWindow(tk.Tk):
 
 
         self.CC = ColorControl() # this is the color control
+        self.DC = DataControler()
 
         self.Monitor = get_monitors()[0] # gets the second monitor
         self.geometry(f"500x400")
@@ -96,4 +101,4 @@ class CreateEventWindow(tk.Tk):
             "Date": [self.YearInputData.get(), self.MonthInputData.get(), self.DayInputData.get()]
         }
 
-        print(EventData)
+        self.DC.SaveEventData(EventData)
