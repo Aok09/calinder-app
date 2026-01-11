@@ -17,4 +17,4 @@ for area in Holidays:
 with open("UkHolidaysNewFile.json", "w") as File:
     json.dump(DictOfHolidays, File)
 
-print(DictOfHolidays)
+

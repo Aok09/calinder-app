@@ -1,6 +1,5 @@
 class MouseEventHandler:
     def __init__ (self):
-        print("mouse")
         self.MouseWasOver = None
         self.MouseIsOver = None
         self.OverCalinderGrid = False

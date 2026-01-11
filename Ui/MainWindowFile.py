@@ -3,14 +3,14 @@ from Ui.ColorControlFile import ColorControl
 from DataDump.DataControlFile import DataControler
 from Ui.FontControlFile import FontControl
 
-import math, calendar, time
+import math, calendar, time, inspect
+
 def RoundToSigN(x, sig=3):
     return round(x, sig - int(math.floor(math.log10(abs(x)))) - 1)
 
 class CreateUiElimants():
     """docstring for CreateUiElimants"""
     def __init__(self):
-        print ("imported CreateUiElimants")
         self.CC = ColorControl() # this is the color control 
         self.DC = DataControler() # this is for data controlling
         self.FC = FontControl() # is for well font control
@@ -49,6 +49,9 @@ class CreateUiElimants():
         if bool(MainCanvas.find_withtag("TiTheCalinderGridtleCard")):
             MainCanvas.delete("TheCalinderGrid")
 
+        # so that its not just the same array being passed around
+        TempDate = [WorkingDate[0], WorkingDate[1], WorkingDate[2], "lol"]
+
         # this entier function only creates 1 thing
         LittleTempList = []
         # the main calinder grid is:
@@ -80,7 +83,7 @@ class CreateUiElimants():
         DayWidthOffSet = StaticTopWidthoffset
         DayHightOffSet = StaticTopHightOffset
 
-        FistDayOfMonth, MonthLength = calendar.monthrange(WorkingDate[0], WorkingDate[1])
+        FistDayOfMonth, MonthLength = calendar.monthrange(int(WorkingDate[0]), int(WorkingDate[1]))
 
         # this part has become very clunky but it works from my limeted testing and will be easy to update a a later date
         BoxNumber = 0 # the box number it self indopedant of the day 
@@ -92,7 +95,6 @@ class CreateUiElimants():
         #creates the calnder gird that is 7 across and 6 down
         for Hight in range(6): # how meany weeks to add
             for Width in range(7): # how meany days in a week
-
 
                 # this is the part that checks if the day is in the month
                 BoxNumber += 1
@@ -111,9 +113,9 @@ class CreateUiElimants():
                     TextColor = self.CC.HighLightColor()
 
                     # for now to get things done, the events are going to loaded from here as i cant think of a better place to add them from
-                    WorkingDate[2] = DayNumber
+                    TempDate[2] = DayNumber
 
-                    DaysHoliday = self.DC.GetHoldaysForDayX(WorkingDate)
+                    DaysHoliday = self.DC.GetHoldaysForDayX(TempDate)
 
                 else:
                     BoxColor = self.CC.DarkBackGroundColor()
@@ -175,7 +177,6 @@ class CreateUiElimants():
             "TheDayArray": TheDaysMade # a dict of each day box 
         }
         # MainCanvas.create_rectangle(StaticTopWidthoffset, StaticTopHightOffset, StaticBottomWidthOffset, StaticBottomHightOffset, fill="red", outline="pink")
-
         return BoxSizeData 
 
     def CreateCorrectTittles(self, Window, MainCanvas, WorkingDate):

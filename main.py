@@ -1,7 +1,7 @@
 from screeninfo import get_monitors
 import tkinter as tk
 from datetime import date
-import time
+import time, calendar, inspect, copy
 
 from Ui.ColorControlFile import ColorControl
 from Ui.MainWindowFile import CreateUiElimants
@@ -19,10 +19,10 @@ class MainWindow(tk.Tk):
         self.ElemntBuilder = CreateUiElimants()
 
         self.Monitor = get_monitors()[0] # gets the second monitor
-        self.WorkingDate = [int(date.today().year), int(date.today().month), int(date.today().day)]
-        print (f"year: {date.today().year}")
-        print (f"month: {date.today().month}")
-        print (f"day: {date.today().day}")
+        self.WorkingDate = list(map(int,[int(date.today().year), int(date.today().month), int(date.today().day)]))
+
+        self.WorkingDate = list(map(int, self.WorkingDate))
+
         self.RenderdOnScreen = {}
         self.ToBeRenderdOnScreen = []
         # creates the window and places it on the second screen
@@ -41,14 +41,12 @@ class MainWindow(tk.Tk):
         self.mainloop()
 
     def OnStart(self):
-        print ("run start")
 
         
         EventsToday = self.ElemntBuilder.BuildDayEvents(self, self.CalinderCanvas) # creates the side bar to view the the events of today
         self.RenderdOnScreen["EventsOfToday"] = EventsToday
 
-
-        CalinderGrid = self.ElemntBuilder.BuildMonthDayGrid(self, self.CalinderCanvas, self.WorkingDate) 
+        CalinderGrid = self.ElemntBuilder.BuildMonthDayGrid(self, self.CalinderCanvas, self.WorkingDate)
         self.RenderdOnScreen["CalinderGrid"] = CalinderGrid
 
 
@@ -78,16 +76,26 @@ class MainWindow(tk.Tk):
     
     def ScrollWheel(self, event):
         ScrollingOn = self.MEH.WhereIsMouse(event, self.RenderdOnScreen)
-        print(ScrollingOn)
         
         # if scrolling on the main calinder view
         if ScrollingOn["WhatIsOn"][0] == True:
-            print (event)
-            UporDown = 1 if event.delta == 120 else -1
-            self.WorkingDate[1] = int(self.WorkingDate[1]) + UporDown 
-            CalinderGrid = self.ElemntBuilder.BuildMonthDayGrid(self, self.CalinderCanvas, self.WorkingDate) 
+            UporDown = -1 if event.delta == 120 else 1
+            self.UpdateDate(0, UporDown, 0)
+            CalinderGrid = self.ElemntBuilder.BuildMonthDayGrid(self, self.CalinderCanvas, copy.deepcopy(self.WorkingDate)) 
             self.ElemntBuilder.CreateCorrectTittles(self, self.CalinderCanvas, self.WorkingDate)
 
             self.RenderdOnScreen["CalinderGrid"] = CalinderGrid
+
+    def UpdateDate(self, AddYear, AddMonth, AddDay):
+        # MonthLength = calendar.monthrange(self.WorkingDate[0], int(self.WorkingDate[1]))[1]
+        self.WorkingDate[1] += AddMonth
+        if self.WorkingDate[1] == 13:
+            self.WorkingDate[0] += 1
+            self.WorkingDate[1] = 1
+
+        if self.WorkingDate[1] == 0:
+            self.WorkingDate[0] -= 1
+            self.WorkingDate[1] = 12
+        
 
 MainWindow()
