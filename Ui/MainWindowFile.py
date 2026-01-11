@@ -156,7 +156,7 @@ class CreateUiElimants():
                     "MainBox": [DayWidthOffSet, DayHightOffSet, DayWidthOffSet+DayWidth, DayHightOffSet+DayHight], 
                     "DayText": [DayWidthOffSet+(DayWidth/16), DayHightOffSet+(DayHight/8)],
                     "holidayText": [DayWidthOffSet+(DayWidth/8), DayHightOffSet+(DayHight/8)], 
-                    "DayData": {"events": [None], "Holiday": DaysHoliday, "DaysDate": DayNumber}
+                    "DayData": {"events": [None], "Holiday": DaysHoliday, "DaysDate": DayNumber if DayActive else 0}
                     }
                 
                 # this is a debug text 
