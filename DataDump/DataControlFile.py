@@ -62,4 +62,4 @@ class DataControler:
             
             return OpendFile
 
-        return []
+        return False
