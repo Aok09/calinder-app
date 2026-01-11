@@ -1,4 +1,6 @@
-import json, os, re
+from pathlib import Path
+
+import json, os, re, time
 class DataControler:
     def __init__(self):
         # grabs the path to THIS file 
@@ -27,3 +29,37 @@ class DataControler:
         return " "
 
 
+    def SaveEventData(self, EventData):
+        Pathed = Path(f"{self.ScriptDir}\\UserEvents\\{EventData['Date'][0]}\\{EventData['Date'][1]}\\{EventData['Date'][2]}\\DayEvents.json")
+
+        if not Pathed.exists():
+            # Create folders if needed
+            Pathed.parent.mkdir(parents=True, exist_ok=True)
+
+            # Write JSON correctly
+            with open(Pathed, "w", encoding="utf-8") as File:
+                json.dump({time.time():EventData}, File, indent=4)
+
+            return
+        
+        if Pathed.exists():
+            with open(Pathed, "r", encoding="utf-8") as File:
+                OpendFile = json.load(File)
+            
+            OpendFile[time.time()] = EventData
+            
+            with open(Pathed, "w", encoding="utf-8") as File:
+                json.dump(OpendFile, File, indent=4)
+
+    def GetDayEvents(self, Date):
+        Pathed = Path(f"{self.ScriptDir}\\UserEvents\\{Date[0]}\\{int(Date[1])}\\{Date[2]}\\DayEvents.json")
+
+            
+
+        if Pathed.exists():
+            with open(Pathed, "r", encoding="utf-8") as File:
+                OpendFile = json.load(File)
+            
+            return OpendFile
+
+        return []
