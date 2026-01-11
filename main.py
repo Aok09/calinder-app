@@ -7,15 +7,16 @@ from Ui.ColorControlFile import ColorControl
 from Ui.MainWindowFile import CreateUiElimants
 from Ui.FontControlFile import FontControl
 from Ui.MouseEventHandlerFile import MouseEventHandler
+from Ui.CreateEventWindowFile import CreateEventWindow
 
 class MainWindow(tk.Tk):
-    """docstring for MainWindow"""
     def __init__(self):
 
         super().__init__() # this is what tels the class to use tk
 
         self.CC = ColorControl() # this is the color control 
         self.MEH = MouseEventHandler()
+
         self.ElemntBuilder = CreateUiElimants()
 
         self.Monitor = get_monitors()[0] # gets the second monitor
@@ -26,6 +27,7 @@ class MainWindow(tk.Tk):
         self.RenderdOnScreen = {}
         self.ToBeRenderdOnScreen = []
         # creates the window and places it on the second screen
+        self.title("calinder app v4 or something")
         self.geometry(f"+{self.Monitor.x}+{self.Monitor.y}")
         self.state("zoomed")
         
@@ -73,6 +75,8 @@ class MainWindow(tk.Tk):
 
     def OnClick(self, event):
         ClickingOn = self.MEH.WhereIsMouse(event, self.RenderdOnScreen)
+        if ClickingOn["WhatIsOn"][0] == True:
+            CreateEventWindow([self.WorkingDate[0], self.WorkingDate[1], self.WorkingDate[2]], ClickingOn)
     
     def ScrollWheel(self, event):
         ScrollingOn = self.MEH.WhereIsMouse(event, self.RenderdOnScreen)
